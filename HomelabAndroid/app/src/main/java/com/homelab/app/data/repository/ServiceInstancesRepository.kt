@@ -281,6 +281,7 @@ private fun normalizeUrl(raw: String, type: ServiceType? = null, allowHttp: Bool
         when (type) {
             ServiceType.UNIFI_NETWORK -> stripKnownUnifiApiPath(clean)
             ServiceType.PANGOLIN -> stripKnownPangolinApiPath(clean)
+            ServiceType.UPTIME_KUMA -> stripKnownUptimeKumaApiPath(clean)
             else -> clean
         }
     } catch (_: Exception) {
@@ -290,7 +291,11 @@ private fun normalizeUrl(raw: String, type: ServiceType? = null, allowHttp: Bool
             clean = "https://$clean"
         }
         val withoutSlash = clean.replace(Regex("/+$"), "")
-        if (type == ServiceType.PANGOLIN) stripKnownPangolinApiPath(withoutSlash) else withoutSlash
+        when (type) {
+            ServiceType.PANGOLIN -> stripKnownPangolinApiPath(withoutSlash)
+            ServiceType.UPTIME_KUMA -> stripKnownUptimeKumaApiPath(withoutSlash)
+            else -> withoutSlash
+        }
     }
 }
 
@@ -331,6 +336,18 @@ private fun stripKnownPangolinApiPath(raw: String): String {
         val uri = URI(raw)
         val path = uri.rawPath.orEmpty().trimEnd('/')
         if (path == "/api/v1" || path == "/api" || path == "/v1") {
+            URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
+        } else {
+            raw
+        }
+    }.getOrDefault(raw)
+}
+
+private fun stripKnownUptimeKumaApiPath(raw: String): String {
+    return runCatching {
+        val uri = URI(raw)
+        val path = uri.rawPath.orEmpty().trimEnd('/')
+        if (path == "/metrics" || path == "/dashboard" || path.startsWith("/dashboard/") || path.startsWith("/status")) {
             URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
         } else {
             raw

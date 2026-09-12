@@ -16,6 +16,12 @@ class HtmlDetectionInterceptor @Inject constructor() : Interceptor {
             return response
         }
 
+        // 401 Unauthorized and 403 Forbidden should be handled by standard authentication error flows
+        // (even if the web server/reverse proxy returns an HTML body or text/html header).
+        if (response.code == 401 || response.code == 403) {
+            return response
+        }
+
         val contentType = response.header("Content-Type")?.lowercase()
         val isHtmlContentType = contentType?.contains("text/html") == true ||
             contentType?.contains("application/xhtml+xml") == true

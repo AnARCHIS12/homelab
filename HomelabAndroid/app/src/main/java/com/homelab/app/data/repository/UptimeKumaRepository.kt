@@ -128,7 +128,17 @@ class UptimeKumaRepository @Inject constructor(
             .execute()
             .use { response ->
                 when (response.code) {
-                    in 200..399 -> response.body?.string().orEmpty()
+                    in 200..399 -> {
+                        val contentType = response.header("Content-Type")?.lowercase().orEmpty()
+                        val body = response.body?.string().orEmpty()
+                        if (contentType.contains("text/html") ||
+                            body.trimStart().startsWith("<!doctype html", ignoreCase = true) ||
+                            body.trimStart().startsWith("<html", ignoreCase = true)
+                        ) {
+                            throw IllegalStateException("Le serveur a renvoyé une page HTML au lieu des métriques Uptime Kuma. Vérifiez l'adresse de votre instance.")
+                        }
+                        body
+                    }
                     401, 403 -> throw IllegalStateException("Uptime Kuma authentication failed.")
                     else -> throw IllegalStateException("Uptime Kuma returned HTTP ${response.code}.")
                 }
@@ -281,7 +291,12 @@ private fun cleanUrl(raw: String): String {
     if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
         clean = "https://$clean"
     }
-    return clean.replace(Regex("/+$"), "")
+    clean = clean.replace(Regex("/+$"), "")
+    return clean
+        .removeSuffix("/metrics")
+        .removeSuffix("/dashboard")
+        .removeSuffix("/status")
+        .removeSuffix("/")
 }
 
 private fun cleanOptionalUrl(raw: String?): String? {

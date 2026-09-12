@@ -17,7 +17,15 @@ object ErrorHandler {
     fun getMessage(context: Context, error: Throwable?): String {
         Logger.e("ErrorHandler", "Handling error", error)
         return when (error) {
-            is HtmlResponseException -> context.getString(R.string.error_html_response)
+            is HtmlResponseException -> {
+                when (error.statusCode) {
+                    401 -> context.getString(R.string.error_invalid_credentials)
+                    403 -> context.getString(R.string.error_forbidden)
+                    404 -> context.getString(R.string.error_not_found)
+                    in 500..599 -> context.getString(R.string.error_server)
+                    else -> context.getString(R.string.error_html_response)
+                }
+            }
             is ConnectException, is UnknownHostException -> context.getString(R.string.error_server_unreachable) // We'll need to add string resources
             is SocketTimeoutException -> context.getString(R.string.error_timeout)
             is SerializationException -> context.getString(R.string.error_parsing)

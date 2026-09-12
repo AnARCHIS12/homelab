@@ -449,10 +449,15 @@ class AuthInterceptor @Inject constructor(
                 }
             }
             ServiceType.UPTIME_KUMA -> {
-                if (!hasAuthorization && !instance.password.isNullOrBlank()) {
-                    val credentials = "${instance.username.orEmpty()}:${instance.password}"
-                    val encoded = java.util.Base64.getEncoder().encodeToString(credentials.toByteArray(Charsets.UTF_8))
-                    builder.addHeader("Authorization", "Basic $encoded")
+                if (!hasAuthorization) {
+                    val secret = instance.password?.takeIf { it.isNotBlank() }
+                        ?: instance.apiKey?.takeIf { it.isNotBlank() }
+                        ?: instance.token.takeIf { it.isNotBlank() }
+                    if (!secret.isNullOrBlank()) {
+                        val credentials = "${instance.username.orEmpty()}:$secret"
+                        val encoded = java.util.Base64.getEncoder().encodeToString(credentials.toByteArray(Charsets.UTF_8))
+                        builder.addHeader("Authorization", "Basic $encoded")
+                    }
                 }
             }
             ServiceType.UNIFI_NETWORK -> {
