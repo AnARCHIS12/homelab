@@ -37,6 +37,7 @@ import com.homelab.app.domain.model.PiHoleAuthMode
 import com.homelab.app.domain.model.ServiceInstance
 import com.homelab.app.util.ErrorHandler
 import com.homelab.app.util.ServiceType
+import com.homelab.app.data.security.UrlSecurityValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.net.URI
@@ -108,7 +109,9 @@ class ServiceLoginViewModel @Inject constructor(
         apiKey: String = "",
         fallbackUrl: String = "",
         mfaCode: String = "",
-        allowSelfSigned: Boolean = true,
+        allowSelfSigned: Boolean = false,
+        allowHttp: Boolean = false,
+        customCertFingerprint: String = "",
         proxmoxRealm: String = "pam",
         proxmoxOtp: String = "",
         proxmoxUseApiToken: Boolean = false
@@ -126,6 +129,7 @@ class ServiceLoginViewModel @Inject constructor(
             val trimmedPassword = password.trim()
             val trimmedApiKey = apiKey.trim()
             val trimmedMfaCode = mfaCode.trim()
+            val trimmedFingerprint = customCertFingerprint.trim()
             val normalizedStoredUsername = when (serviceType) {
                 ServiceType.PROXMOX -> {
                     if (trimmedUsername.isBlank()) ""
@@ -136,18 +140,27 @@ class ServiceLoginViewModel @Inject constructor(
             }
 
             try {
+                UrlSecurityValidator.validateUrl(cleanUrl, allowHttp = allowHttp)
+                if (cleanFallbackUrl != null) {
+                    UrlSecurityValidator.validateUrl(cleanFallbackUrl, allowHttp = allowHttp)
+                }
+
                 val metadataOnly = existing != null &&
                     existing.url == cleanUrl &&
                     existing.username.orEmpty() == normalizedStoredUsername &&
                     existing.apiKey.orEmpty() == trimmedApiKey &&
                     existing.piHoleStoredSecret.orEmpty() == trimmedPassword &&
-                    existing.allowSelfSigned == allowSelfSigned
+                    existing.allowSelfSigned == allowSelfSigned &&
+                    existing.allowHttp == allowHttp &&
+                    existing.customCertFingerprint.orEmpty() == trimmedFingerprint
 
                 val instance = if (metadataOnly) {
                     existing.copy(
                         label = normalizedLabel,
                         fallbackUrl = cleanFallbackUrl,
-                        allowSelfSigned = allowSelfSigned
+                        allowSelfSigned = allowSelfSigned,
+                        allowHttp = allowHttp,
+                        customCertFingerprint = trimmedFingerprint.ifBlank { null }
                     )
                 } else {
                     when (serviceType) {
@@ -749,7 +762,11 @@ class ServiceLoginViewModel @Inject constructor(
                             )
                         }
                     }
-                }.copy(allowSelfSigned = allowSelfSigned)
+                }.copy(
+                    allowSelfSigned = allowSelfSigned,
+                    allowHttp = allowHttp,
+                    customCertFingerprint = trimmedFingerprint.ifBlank { null }
+                )
 
                 servicesRepository.saveInstance(instance)
                 _existingInstance.value = instance

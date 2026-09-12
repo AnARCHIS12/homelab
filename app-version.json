@@ -1,6 +1,6 @@
 {
   "latest": "1.6.2",
-  "ios_url": "https://github.com/JohnnWi/homelab-project/releases/download/v1.6.2/Homelab.ipa",
-  "android_url": "https://github.com/JohnnWi/homelab-project/releases/download/v1.6.2/Homelab.apk",
+  "ios_url": "https://github.com/AnARCHIS12/homelab/releases/download/v1.6.2/Homelab.ipa",
+  "android_url": "https://github.com/AnARCHIS12/homelab/releases/download/v1.6.2/Homelab.apk",
   "changelog": "Removed the crypto donation section from Settings on iOS and Android.\nCleaned up related donation strings and settings UI copy.\nIncluded minor settings maintenance for the 1.6.2 release."
 }

@@ -3,14 +3,13 @@ package com.homelab.app.ui.security
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.homelab.app.data.repository.LocalPreferencesRepository
+import com.homelab.app.data.security.PinVerificationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,20 +18,14 @@ class SecurityViewModel @Inject constructor(
     private val servicesRepository: com.homelab.app.data.repository.ServicesRepository
 ) : ViewModel() {
 
-    val isPinSet: StateFlow<Boolean> = preferencesRepository.appPin
-        .map { it != null }
+    val isPinSet: StateFlow<Boolean> = preferencesRepository.isPinSet
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val biometricEnabled: StateFlow<Boolean> = preferencesRepository.biometricEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    private val _pin = MutableStateFlow<String?>(null)
-
-    init {
-        viewModelScope.launch {
-            preferencesRepository.appPin.collect { _pin.value = it }
-        }
-    }
+    val lockoutRemainingSeconds: StateFlow<Long> = preferencesRepository.pinLockoutRemainingSeconds
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0L)
 
     fun savePin(pin: String) {
         viewModelScope.launch {
@@ -41,7 +34,13 @@ class SecurityViewModel @Inject constructor(
     }
 
     fun verifyPin(pin: String): Boolean {
-        return _pin.value == pin
+        return runBlocking {
+            preferencesRepository.verifyPin(pin) is PinVerificationResult.Success
+        }
+    }
+
+    suspend fun verifyPinWithResult(pin: String): PinVerificationResult {
+        return preferencesRepository.verifyPin(pin)
     }
 
     fun setBiometricEnabled(enabled: Boolean) {

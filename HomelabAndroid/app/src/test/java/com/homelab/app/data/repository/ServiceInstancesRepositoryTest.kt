@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import com.homelab.app.data.security.FakeSecureCredentialsStore
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -25,6 +26,7 @@ class ServiceInstancesRepositoryTest {
     @Test
     fun `migrates legacy single-instance data only once`() = runTest {
         val dao = FakeServiceInstanceDao()
+        val credentialsStore = FakeSecureCredentialsStore()
         val state = SettingsState(
             legacy = mutableMapOf(
                 ServiceType.PIHOLE to ServiceConnection(
@@ -35,7 +37,7 @@ class ServiceInstancesRepositoryTest {
                 )
             )
         )
-        val repository = ServiceInstancesRepository(dao, settingsManager(state))
+        val repository = ServiceInstancesRepository(dao, settingsManager(state), credentialsStore)
 
         repository.migrateLegacyDataIfNeeded()
         repository.migrateLegacyDataIfNeeded()
@@ -51,8 +53,9 @@ class ServiceInstancesRepositoryTest {
     @Test
     fun `two instances of same type coexist and preferred repairs after delete`() = runTest {
         val dao = FakeServiceInstanceDao()
+        val credentialsStore = FakeSecureCredentialsStore()
         val state = SettingsState()
-        val repository = ServiceInstancesRepository(dao, settingsManager(state))
+        val repository = ServiceInstancesRepository(dao, settingsManager(state), credentialsStore)
         val first = ServiceInstance(
             id = "instance-1",
             type = ServiceType.GITEA,

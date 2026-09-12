@@ -22,6 +22,14 @@ fun LockScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val activity = context as? FragmentActivity
+
+    DisposableEffect(Unit) {
+        val window = activity?.window
+        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose {
+            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
     val wrongPinText = stringResource(R.string.security_wrong_pin)
     val biometricTitle = stringResource(R.string.biometric_reason)
     val biometricSubtitle = stringResource(R.string.security_biometric_desc)

@@ -39,6 +39,13 @@ fun PinSetupScreen(
     var firstPin by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val window = (context as? android.app.Activity)?.window
+        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose {
+            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
     val scope = rememberCoroutineScope()
     val canUseBiometric = remember { BiometricHelper.canAuthenticate(context) }
     val mismatchText = stringResource(R.string.security_pin_mismatch)

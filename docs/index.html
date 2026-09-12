@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07090e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <title>Homelab - Native Android Self-Hosted Dashboard</title>
+  <meta name="description" content="A blazing-fast, secure, and fully native Android dashboard for monitoring and managing 34+ self-hosted services. 100% free and open source. Zero donations.">
+  
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Light Effects -->
+  <div class="bg-ambient">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+  <div class="bg-grid"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="#" class="nav-brand">
+        <img src="assets/logo.png" alt="Homelab Logo" class="nav-logo">
+        <span>Homelab</span>
+      </a>
+      
+      <!-- Desktop Nav Links -->
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#showcase" class="nav-link">Showcase</a></li>
+        <li><a href="#services" class="nav-link">34+ Services</a></li>
+        <li><a href="#privacy" class="nav-link">Privacy</a></li>
+        <li><a href="#install" class="nav-link">Install</a></li>
+      </ul>
+      
+      <!-- Action Buttons -->
+      <div class="nav-actions">
+        <a href="https://github.com/AnARCHIS12/homelab" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span style="display: none; @media(min-width: 480px){display:inline;}">GitHub</span>
+        </a>
+        <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-primary btn-sm direct-download-btn">
+          <span>Download APK</span>
+        </a>
+        <button id="navToggleBtn" class="nav-toggle-btn" aria-label="Toggle navigation">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div id="navMobileMenu" class="nav-mobile-menu">
+    <a href="#features" class="nav-mobile-link">Features</a>
+    <a href="#showcase" class="nav-mobile-link">Showcase</a>
+    <a href="#services" class="nav-mobile-link">34+ Services</a>
+    <a href="#privacy" class="nav-mobile-link">Privacy Policy</a>
+    <a href="#install" class="nav-mobile-link">Installation</a>
+    <a href="https://github.com/AnARCHIS12/homelab" class="nav-mobile-link" target="_blank" rel="noopener">GitHub Repository</a>
+  </div>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container hero-content">
+        <div class="hero-pill">
+          <span class="badge badge-glow">100% Free · Daily Maintained · Android Native</span>
+        </div>
+        <h1 class="hero-title">
+          Your Self-Hosted World.<br>
+          <span class="text-gradient">Right in Your Pocket.</span>
+        </h1>
+        <p class="hero-desc">
+          A blazing-fast, secure, and fully native Android dashboard to monitor and manage your servers, containers, networks, and media stacks. Zero cloud, zero telemetry, and zero donations.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" id="heroDownloadBtn" class="btn btn-primary btn-lg direct-download-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span id="heroDownloadText">Download APK (Latest Release)</span>
+          </a>
+          <a href="#showcase" class="btn btn-secondary btn-lg">
+            <span>Explore Showcase</span>
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat-item">
+            <div class="hero-stat-num">34+</div>
+            <div class="hero-stat-label">Services Supported</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num">100%</div>
+            <div class="hero-stat-label">Free Forever</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num">AES-256</div>
+            <div class="hero-stat-label">KeyStore Hardware Armor</div>
+          </div>
+          <div class="hero-stat-item">
+            <div class="hero-stat-num">0%</div>
+            <div class="hero-stat-label">Telemetry or Tracking</div>
+          </div>
+        </div>
+
+        <!-- Phone Mockup Showcase -->
+        <div class="hero-mockup-wrapper">
+          <div class="hero-mockup-glow"></div>
+          
+          <!-- Floating Telemetry Cards -->
+          <div class="floating-card floating-card-left">
+            <div class="floating-icon" style="background: rgba(234, 88, 12, 0.15); color: #ea580c;">
+              <img src="https://cdn.jsdelivr.net/gh/selfhst/icons/png/proxmox.png" width="22" height="22" alt="Proxmox">
+            </div>
+            <div class="floating-info">
+              <span class="floating-title">Proxmox Cluster</span>
+              <span class="floating-sub">3 Nodes Online · CPU 14%</span>
+            </div>
+          </div>
+
+          <div class="floating-card floating-card-right">
+            <div class="floating-icon" style="background: rgba(220, 38, 38, 0.15); color: #dc2626;">
+              <img src="https://cdn.jsdelivr.net/gh/selfhst/icons/png/pi-hole.png" width="22" height="22" alt="Pi-hole">
+            </div>
+            <div class="floating-info">
+              <span class="floating-title">Pi-hole Armor</span>
+              <span class="floating-sub">28,410 Queries · 34.2% Blocked</span>
+            </div>
+          </div>
+
+          <!-- Phone Frame -->
+          <div class="phone-frame">
+            <div class="phone-speaker"></div>
+            <div class="phone-screen">
+              <img src="assets/screenshots/Dashboard.jpg" alt="Homelab Android Dashboard View">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features / Bento Grid -->
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag"><span class="badge badge-glow">Why Homelab</span></div>
+          <h2 class="section-title">Engineered for Privacy, Speed, and Freedom</h2>
+          <p class="section-desc">We built the dashboard we wanted for our own homelabs: uncompromisingly private, robustly secure, and free from proprietary restrictions.</p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Card 1: 100% Free & No Donations -->
+          <div class="bento-card bento-card-8">
+            <div class="bento-icon-box" style="background: rgba(52, 211, 153, 0.1); border-color: rgba(52, 211, 153, 0.3); color: var(--accent-emerald);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>
+            </div>
+            <h3 class="bento-title">100% Free Forever & Zero Donations</h3>
+            <p class="bento-desc">
+              Homelab is not a commercial product and never will be. There are no paid tiers, no premium unlocks, no subscriptions, and no advertisements. Furthermore, <strong>we will never ask for or accept any donations</strong>. The application is maintained purely for the self-hosting and open-source community.
+            </p>
+            <div class="bento-tag-list">
+              <span class="bento-tag">No Paywalls</span>
+              <span class="bento-tag">No Donations Accepted</span>
+              <span class="bento-tag">Apache 2.0 License</span>
+              <span class="bento-tag">Community First</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Anti-Walled Garden -->
+          <div class="bento-card bento-card-4">
+            <div class="bento-icon-box" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3); color: var(--accent-violet);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+            </div>
+            <h3 class="bento-title">Android-First, Anti-Walled Garden</h3>
+            <p class="bento-desc">
+              We officially discontinued and abandoned iOS support. We are opposed to Apple's closed, restrictive ecosystem. 100% of our effort goes into Android freedom and sideloading.
+            </p>
+          </div>
+
+          <!-- Card 3: Security & Encryption -->
+          <div class="bento-card bento-card-6">
+            <div class="bento-icon-box" style="background: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.3); color: var(--accent-cyan);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3 class="bento-title">Hardware-Backed KeyStore Security</h3>
+            <p class="bento-desc">
+              Your API keys and passwords never touch plain storage. They are encrypted with AES-256-GCM backed by the Android Hardware KeyStore (TEE / StrongBox). Includes PBKDF2 PIN hashing, Biometric Unlock, and screen capture prevention (<code>FLAG_SECURE</code>).
+            </p>
+          </div>
+
+          <!-- Card 4: Multi-Instance & Remote Access -->
+          <div class="bento-card bento-card-6">
+            <div class="bento-icon-box" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); color: #f59e0b);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+            </div>
+            <h3 class="bento-title">Multi-Instance & Tailscale Ready</h3>
+            <p class="bento-desc">
+              Seamlessly switch between home LAN and remote connections. Integrate multiple instances of the same service (e.g. 2 Pi-holes, 3 Proxmox clusters) and launch Tailscale / WireGuard with one tap.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Showcase Section -->
+    <section id="showcase" class="section">
+      <div class="container showcase-container">
+        <div class="section-header">
+          <div class="section-tag"><span class="badge badge-glow">App Showcase</span></div>
+          <h2 class="section-title">Designed with Jetpack Compose & Material 3</h2>
+          <p class="section-desc">Experience fluid animations, dynamic color theming, and an interface built from the ground up for modern Android phones.</p>
+        </div>
+
+        <!-- Showcase Tabs -->
+        <div class="showcase-tabs-wrapper">
+          <div class="showcase-tabs">
+            <button class="showcase-tab active" data-showcase="dashboard">Dashboard</button>
+            <button class="showcase-tab" data-showcase="servarr">Servarr Stack</button>
+            <button class="showcase-tab" data-showcase="containers">Containers & Fleet</button>
+            <button class="showcase-tab" data-showcase="network">DNS & Proxy</button>
+            <button class="showcase-tab" data-showcase="monitoring">Observability</button>
+          </div>
+        </div>
+
+        <!-- Showcase Preview -->
+        <div class="showcase-preview-frame">
+          <div class="showcase-screen-wrapper">
+            <img id="showcaseImg" src="assets/screenshots/Dashboard.jpg" alt="Homelab Interface Preview">
+          </div>
+          <div class="showcase-screen-info">
+            <h3 id="showcaseTitle">Unified Homelab Overview</h3>
+            <p id="showcaseDesc">Get an instant high-level view of all your self-hosted services, server statuses, resource metrics, and quick action shortcuts in one single screen.</p>
+            <ul id="showcaseList" class="showcase-features-list">
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Instant online/offline health status across nodes</span>
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Customizable service cards with live counters</span>
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Quick navigation to specialized sub-dashboards</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Directory Section -->
+    <section id="services" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag"><span class="badge badge-glow">Extensive Ecosystem</span></div>
+          <h2 class="section-title">34+ Self-Hosted Integrations</h2>
+          <p class="section-desc">From virtualization clusters to DNS sinkholes and automated media pipelines, Homelab communicates directly with your services.</p>
+        </div>
+
+        <!-- Filter and Search -->
+        <div class="services-controls">
+          <div class="services-filter-wrapper">
+            <div class="services-filter-tabs">
+              <button class="service-filter-btn active" data-filter="all">All Services (34)</button>
+              <button class="service-filter-btn" data-filter="infrastructure">Core Infrastructure</button>
+              <button class="service-filter-btn" data-filter="networking">Networking & DNS</button>
+              <button class="service-filter-btn" data-filter="media">Media & Streams</button>
+              <button class="service-filter-btn" data-filter="servarr">Servarr Stack</button>
+            </div>
+          </div>
+          <div class="service-search-box">
+            <svg class="service-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="serviceSearch" class="service-search-input" placeholder="Search (Proxmox, Pi-hole, Sonarr)..." autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div id="servicesGrid" class="services-grid">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy Policy Section -->
+    <section id="privacy" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag"><span class="badge badge-emerald">Privacy First</span></div>
+          <h2 class="section-title">Your Data Stays on Your Hardware</h2>
+          <p class="section-desc">We do not operate servers, do not collect telemetry, and do not track users. Period.</p>
+        </div>
+
+        <div class="privacy-card">
+          <div class="privacy-grid">
+            <div class="privacy-point">
+              <div class="privacy-point-header">
+                <div class="privacy-point-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <h4 class="privacy-point-title">Zero Cloud Intermediaries</h4>
+              </div>
+              <p class="privacy-point-desc">
+                Homelab is a direct client. Requests leave your Android device and go straight to the server URL you provided. No cloud relay, no middleman server.
+              </p>
+            </div>
+
+            <div class="privacy-point">
+              <div class="privacy-point-header">
+                <div class="privacy-point-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h4 class="privacy-point-title">Encrypted at Rest</h4>
+              </div>
+              <p class="privacy-point-desc">
+                Tokens, basic auth passwords, and API credentials are encrypted with AES-256-GCM using keys stored exclusively in the Android KeyStore.
+              </p>
+            </div>
+
+            <div class="privacy-point">
+              <div class="privacy-point-header">
+                <div class="privacy-point-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </div>
+                <h4 class="privacy-point-title">No Telemetry or Tracking</h4>
+              </div>
+              <p class="privacy-point-desc">
+                Zero crash-report tracking libraries, zero ad identifiers, and zero analytics beacons. What you do with your homelab is strictly your business.
+              </p>
+            </div>
+
+            <div class="privacy-point">
+              <div class="privacy-point-header">
+                <div class="privacy-point-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </div>
+                <h4 class="privacy-point-title">Encrypted Backups</h4>
+              </div>
+              <p class="privacy-point-desc">
+                Export and restore encrypted backup files stored directly on your phone or shared via your private storage. You hold the master key.
+              </p>
+            </div>
+          </div>
+
+          <div class="privacy-cta-box">
+            <div>
+              <strong style="color: var(--text-primary); font-size: 1rem;">Looking for the complete legal text?</strong>
+              <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 2px;">Read our detailed privacy policy statement.</div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button id="openPrivacyModal" class="btn btn-secondary btn-sm">
+                <span>View Legal Policy Modal</span>
+              </button>
+              <a href="privacy.html" class="btn btn-primary btn-sm">
+                <span>Open privacy.html</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation & Building Section -->
+    <section id="install" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag"><span class="badge badge-glow">Get Started</span></div>
+          <h2 class="section-title">Install Homelab Today</h2>
+          <p class="section-desc">Download the latest release APK or compile it yourself directly with Gradle.</p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Install via APK -->
+          <div class="bento-card bento-card-6">
+            <h3 class="bento-title">Direct APK Download</h3>
+            <p class="bento-desc" style="margin-bottom: 20px;">
+              Download the release APK directly to your phone. No Google Play required, no account needed.
+            </p>
+            <ol style="color: var(--text-secondary); margin-left: 20px; line-height: 1.8; margin-bottom: 24px; font-size: 0.92rem;">
+              <li>Tap the button below to download <code>Homelab.apk</code>.</li>
+              <li>Open the downloaded APK to install.</li>
+              <li>Allow "Install unknown apps" if requested by Android.</li>
+              <li>Add your services and enjoy your homelab on mobile!</li>
+            </ol>
+            <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-primary direct-download-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download Homelab.apk</span>
+            </a>
+          </div>
+
+          <!-- Build from Source -->
+          <div class="bento-card bento-card-6">
+            <h3 class="bento-title">Build from Source</h3>
+            <p class="bento-desc" style="margin-bottom: 14px;">
+              Homelab is fully open source. Compile it with Android Studio Ladybug+ or straight from the command line:
+            </p>
+            <div class="code-box">
+              <button id="copyBuildCmd" class="code-copy-btn">Copy</button>
+              <pre><code>git clone https://github.com/AnARCHIS12/homelab.git
+cd homelab-project/HomelabAndroid
+./gradlew :app:compileDebugKotlin
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleRelease</code></pre>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 14px;">
+              Signed release APK output: <code>HomelabAndroid/app/build/outputs/apk/release/app-release.apk</code>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Bottom Bar for Mobile Devices -->
+  <div class="mobile-sticky-bar">
+    <div class="mobile-sticky-info">
+      <img src="assets/logo.png" alt="Homelab Logo" class="mobile-sticky-logo">
+      <div>
+        <div class="mobile-sticky-text">Homelab</div>
+        <div class="mobile-sticky-sub">100% Free · Android Native</div>
+      </div>
+    </div>
+    <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-primary btn-sm direct-download-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline></svg>
+      <span>Download</span>
+    </a>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div id="privacyModal" class="modal-overlay">
+    <div class="modal-content">
+      <button id="closePrivacyModal" class="modal-close-btn">&times;</button>
+      <h2 style="font-size: 1.8rem; margin-bottom: 8px; color: var(--text-primary);">Homelab Privacy Policy</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 24px;">Last updated: September 12, 2026</p>
+      
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">
+        Homelab is a free, open-source client application designed to monitor and manage self-hosted services configured by the user. The app operates under a strict privacy-first architecture.
+      </p>
+
+      <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin: 24px 0 8px;">1. Zero Hosted Backend & No User Accounts</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Homelab does not operate any centralized backend servers, cloud databases, or authentication systems. We do not provide user accounts, do not store your data on external servers, and do not act as an intermediary for your traffic.
+      </p>
+
+      <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin: 24px 0 8px;">2. Local Storage & Hardware-Backed Security</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        All service URLs, hostnames, authentication credentials, tokens, API keys, and preferences are stored exclusively on your local Android device. Sensitive secrets are protected with AES-256-GCM hardware-backed encryption via the Android KeyStore.
+      </p>
+
+      <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin: 24px 0 8px;">3. Direct Network Connections</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        All network communications initiated by Homelab go directly to the host addresses configured by the user (e.g. your local LAN, VPN, or reverse proxy). Data returned by those endpoints is rendered directly in the app without passing through any external servers.
+      </p>
+
+      <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin: 24px 0 8px;">4. Zero Telemetry, Analytics, or Advertising</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">
+        Homelab does not include any third-party tracking SDKs, analytics beacons, crash-telemetry reporters, or advertising frameworks.
+      </p>
+
+      <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin: 24px 0 8px;">5. Backups & User Control</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 24px;">
+        Backup files created via the app remain in your direct control. Encrypted backups require your chosen password to decrypt and restore.
+      </p>
+
+      <div style="border-top: 1px solid var(--card-border); padding-top: 20px; display: flex; justify-content: flex-end;">
+        <a href="privacy.html" class="btn btn-secondary btn-sm" target="_blank">Open Dedicated Page</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo-row">
+            <img src="assets/logo.png" alt="Homelab Logo" width="32" height="32" style="border-radius: 8px;">
+            <span style="font-weight: 700; font-size: 1.2rem;">Homelab</span>
+          </div>
+          <p class="footer-desc">
+            Free, open-source native Android dashboard for your self-hosted universe. Built with Kotlin and Jetpack Compose.
+          </p>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-col-title">Navigation</div>
+          <a href="#features" class="footer-link">Features</a>
+          <a href="#showcase" class="footer-link">Showcase</a>
+          <a href="#services" class="footer-link">34+ Services</a>
+          <a href="#install" class="footer-link">Download</a>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-col-title">Legal & Security</div>
+          <a href="privacy.html" class="footer-link">Privacy Policy</a>
+          <a href="https://github.com/AnARCHIS12/homelab/blob/main/LICENSE" class="footer-link" target="_blank" rel="noopener">Apache 2.0 License</a>
+          <a href="#privacy" class="footer-link">Security Architecture</a>
+        </div>
+
+        <div class="footer-links-col">
+          <div class="footer-col-title">Community</div>
+          <a href="https://github.com/AnARCHIS12/homelab" class="footer-link" target="_blank" rel="noopener">GitHub Repository</a>
+          <a href="https://github.com/AnARCHIS12/homelab/issues" class="footer-link" target="_blank" rel="noopener">Issues & Feedback</a>
+          <a href="https://github.com/AnARCHIS12/homelab/releases" class="footer-link" target="_blank" rel="noopener">Releases</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 Homelab Project. Licensed under Apache 2.0.</div>
+        <div style="color: var(--accent-cyan); font-weight: 500;">100% Free · No Donations · Daily Maintained</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

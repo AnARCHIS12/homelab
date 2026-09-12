@@ -28,10 +28,11 @@ class HtmlDetectionInterceptor @Inject constructor() : Interceptor {
 
         if (isHtmlContentType || (looksLikeHtml && !isJsonContentType)) {
             val tag = extractServiceTag(request.url.host)
-            Logger.w(tag, "HTML response detected for ${request.method} ${request.url}")
+            val sanitizedUrl = com.homelab.app.data.security.LogSanitizer.sanitizeUrl(request.url)
+            Logger.w(tag, "HTML response detected for ${request.method} $sanitizedUrl")
             response.close()
             throw HtmlResponseException(
-                url = request.url.toString(),
+                url = sanitizedUrl,
                 statusCode = response.code,
                 contentType = contentType,
                 snippet = snippet

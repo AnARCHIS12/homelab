@@ -14,102 +14,59 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  version-consistency:
-    name: Version consistency
+  version-check:
+    name: Verify Android metadata
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Check iOS and Android versions match
+      - name: Verify Android version format
         run: |
           python3 - <<'PY'
           import pathlib
-          import plistlib
           import re
           import sys
 
-          root = pathlib.Path.cwd()
-          gradle = (root / "HomelabAndroid/app/build.gradle.kts").read_text()
-          plist_path = root / "HomelabSwift/Homelab/Info.plist"
-
+          gradle = pathlib.Path("HomelabAndroid/app/build.gradle.kts").read_text()
           version_name = re.search(r'versionName\s*=\s*"([^"]+)"', gradle)
           version_code = re.search(r'versionCode\s*=\s*(\d+)', gradle)
           if not version_name or not version_code:
               print("Could not read Android versionName/versionCode", file=sys.stderr)
               sys.exit(1)
-
-          with plist_path.open("rb") as fp:
-              info = plistlib.load(fp)
-
-          ios_version = str(info.get("CFBundleShortVersionString", ""))
-          ios_build = str(info.get("CFBundleVersion", ""))
-          android_version = version_name.group(1)
-          android_build = version_code.group(1)
-
-          if ios_version != android_version or ios_build != android_build:
-              print(f"Version mismatch: iOS {ios_version} ({ios_build}) vs Android {android_version} ({android_build})", file=sys.stderr)
-              sys.exit(1)
-
-          print(f"Versions match: {ios_version} ({ios_build})")
+          print(f"Android version: {version_name.group(1)} (code {version_code.group(1)})")
           PY
 
-      - name: Ensure release binaries are not tracked
+      - name: Ensure release binaries are not tracked in git
         run: |
           tracked="$(git ls-files '*.ipa' '*.apk' '*.aab')"
           if [ -n "$tracked" ]; then
-            echo "Release binaries must not be committed:"
+            echo "Release binaries must not be committed to source control:"
             echo "$tracked"
             exit 1
           fi
 
-  android-compile:
-    name: Android compile
+  android-build:
+    name: Android Build & Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     defaults:
       run:
         working-directory: HomelabAndroid
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      - uses: gradle/actions/setup-gradle@v6.1.0
+      - uses: gradle/actions/setup-gradle@v4
 
-      - name: Compile Debug Kotlin
+      - name: Compile Kotlin Debug
         run: ./gradlew :app:compileDebugKotlin --console=plain
 
-  ios-compile:
-    name: iOS compile
-    runs-on: macos-26
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: HomelabSwift
-    steps:
-      - uses: actions/checkout@v5
+      - name: Run Unit & Security Tests
+        run: ./gradlew :app:testDebugUnitTest --console=plain
 
-      - name: Show Xcode version
-        run: xcodebuild -version
-
-      - name: Create CI signing config
-        run: |
-          mkdir -p Config
-          cat > Config/Signing.xcconfig <<'EOF'
-          DEVELOPMENT_TEAM =
-          PRODUCT_BUNDLE_IDENTIFIER = homelab.foreverhomelab
-          EOF
-
-      - name: Compile iOS app without signing
-        run: |
-          xcodebuild build \
-            -project Homelab.xcodeproj \
-            -scheme Homelab \
-            -configuration Debug \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath "$RUNNER_TEMP/homelab-ios-dd" \
-            CODE_SIGNING_ALLOWED=NO
+      - name: Assemble Release APK
+        run: ./gradlew :app:assembleRelease --console=plain

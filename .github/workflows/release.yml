@@ -1,0 +1,151 @@
+name: Build & Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g. v1.6.2). Leave empty to use versionName from build.gradle.kts'
+        required: false
+        default: ''
+      release_title:
+        description: 'Release Title'
+        required: false
+        default: ''
+      release_notes:
+        description: 'Release Notes (Markdown)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build & Release Homelab APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Determine Release Tag & Version
+        id: vars
+        run: |
+          VERSION_NAME=$(grep 'versionName = ' HomelabAndroid/app/build.gradle.kts | head -1 | cut -d'"' -f2)
+          VERSION_CODE=$(grep 'versionCode = ' HomelabAndroid/app/build.gradle.kts | head -1 | awk '{print $3}')
+
+          if [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="v${VERSION_NAME}"
+          fi
+
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "version_code=$VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "Target Tag: $TAG, Version: $VERSION"
+
+      - name: Run Android Unit & Security Tests
+        working-directory: HomelabAndroid
+        run: ./gradlew :app:testDebugUnitTest --console=plain
+
+      - name: Build Signed Release APK
+        working-directory: HomelabAndroid
+        run: ./gradlew :app:assembleRelease --console=plain
+
+      - name: Prepare Release Artifacts
+        run: |
+          mkdir -p release-artifacts
+          cp HomelabAndroid/app/build/outputs/apk/release/app-release.apk release-artifacts/Homelab.apk
+          cd release-artifacts
+          sha256sum Homelab.apk > Homelab.apk.sha256
+          echo "SHA256: $(cat Homelab.apk.sha256)"
+          ls -lh Homelab.apk
+
+      - name: Generate Release Notes
+        id: notes
+        run: |
+          TAG="${{ steps.vars.outputs.tag }}"
+          VERSION="${{ steps.vars.outputs.version }}"
+          
+          if [ -n "${{ github.event.inputs.release_notes }}" ]; then
+            echo '${{ github.event.inputs.release_notes }}' > release_notes.md
+          else
+            cat <<EOF > release_notes.md
+          # Homelab $TAG
+
+          Homelab is a 100% free, privacy-first, and native Android dashboard for monitoring and managing your self-hosted homelab.
+
+          ## Highlights
+          - Native Jetpack Compose & Material 3 UI
+          - Support for 34+ self-hosted services
+          - Hardware-backed Android KeyStore AES-256-GCM encryption
+          - PBKDF2 PIN hashing and Biometric Unlock
+          - Screen capture protection (\`FLAG_SECURE\`)
+          - Direct peer-to-peer / LAN communication (Zero cloud, zero telemetry)
+          - 100% Free Forever (No donations, no ads, no subscriptions)
+
+          ## Direct Download
+          - **[Download Homelab.apk](https://github.com/${{ github.repository }}/releases/download/${TAG}/Homelab.apk)**
+
+          ### Verification
+          \`\`\`
+          SHA256: $(cat release-artifacts/Homelab.apk.sha256 | awk '{print $1}')
+          \`\`\`
+          EOF
+          fi
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: ${{ github.event.inputs.release_title || steps.vars.outputs.tag }}
+          body_path: release_notes.md
+          files: |
+            release-artifacts/Homelab.apk
+            release-artifacts/Homelab.apk.sha256
+          draft: false
+          prerelease: false
+
+      - name: Update app-version.json metadata
+        run: |
+          TAG="${{ steps.vars.outputs.tag }}"
+          VERSION="${{ steps.vars.outputs.version }}"
+          APK_URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/Homelab.apk"
+          
+          if [ -f "app-version.json" ]; then
+            jq --arg ver "$VERSION" \
+               --arg url "$APK_URL" \
+               '.latest = $ver | .android_url = $url' \
+               app-version.json > app_ver_tmp.json && mv app_ver_tmp.json app-version.json
+            
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add app-version.json
+            git diff --cached --quiet && echo "No changes to app-version.json" || {
+              git commit -m "chore(release): update app-version.json to $TAG [skip ci]"
+              git push origin HEAD:main || true
+            }
+          fi

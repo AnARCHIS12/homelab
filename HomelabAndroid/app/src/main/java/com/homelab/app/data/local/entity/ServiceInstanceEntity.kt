@@ -10,15 +10,21 @@ data class ServiceInstanceEntity(
     val type: String,
     val label: String,
     val url: String,
-    val token: String,
+    // Sensitive fields: Deprecated and cleared in SQLite database, managed via SecureCredentialsStore
+    @ColumnInfo(defaultValue = "''")
+    val token: String = "",
     val proxmoxCsrfToken: String? = null,
     val proxmoxOtp: String? = null,
-    val username: String?,
-    val apiKey: String?,
-    val piholePassword: String?,
-    val piholeAuthMode: String?,
-    val fallbackUrl: String?,
+    val username: String? = null,
+    val apiKey: String? = null,
+    val piholePassword: String? = null,
+    val piholeAuthMode: String? = null,
+    val fallbackUrl: String? = null,
     @ColumnInfo(defaultValue = "0")
-    val allowSelfSigned: Boolean,
-    val password: String? = null
+    val allowSelfSigned: Boolean = false,
+    val password: String? = null,
+    @ColumnInfo(defaultValue = "0")
+    val allowHttp: Boolean = false,
+    val customCertFingerprint: String? = null,
+    val customCertificatePem: String? = null
 )

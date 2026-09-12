@@ -54,6 +54,14 @@ fun BackupScreen(
     val rememberSelection by viewModel.rememberSelection.collectAsState()
     val context = LocalContext.current
 
+    DisposableEffect(Unit) {
+        val window = (context as? android.app.Activity)?.window
+        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose {
+            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
+
     val configuredTypes = remember(instancesByType) {
         (ServiceType.homeTypes + ServiceType.arrStackTypes)
             .distinct()

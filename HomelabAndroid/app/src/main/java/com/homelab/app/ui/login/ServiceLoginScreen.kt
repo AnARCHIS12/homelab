@@ -37,7 +37,10 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import android.app.Activity
+import android.view.WindowManager
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,9 +53,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -104,9 +109,21 @@ fun ServiceLoginScreen(
     var proxmoxOtp by remember { mutableStateOf("") }
     var proxmoxUseApiToken by remember { mutableStateOf(false) }
     var fallbackUrl by remember { mutableStateOf("") }
-    var allowSelfSigned by remember { mutableStateOf(true) }
+    var allowSelfSigned by remember { mutableStateOf(false) }
+    var allowHttp by remember { mutableStateOf(false) }
+    var customCertFingerprint by remember { mutableStateOf("") }
+    var showHttpWarningDialog by remember { mutableStateOf(false) }
     var showSecret by remember { mutableStateOf(false) }
     var hasSubmitted by remember { mutableStateOf(false) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    DisposableEffect(Unit) {
+        val window = (context as? Activity)?.window
+        window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose {
+            window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
 
     val coroutineScope = rememberCoroutineScope()
     val shakeOffset = remember { Animatable(0f) }
@@ -133,6 +150,8 @@ fun ServiceLoginScreen(
         }
         fallbackUrl = instance.fallbackUrl.orEmpty()
         allowSelfSigned = instance.allowSelfSigned
+        allowHttp = instance.allowHttp
+        customCertFingerprint = instance.customCertFingerprint.orEmpty()
         password = ""
         mfaCode = ""
     }
@@ -402,6 +421,8 @@ fun ServiceLoginScreen(
                     fallbackUrl = fallbackUrl,
                     mfaCode = mfaCode,
                     allowSelfSigned = allowSelfSigned,
+                    allowHttp = allowHttp,
+                    customCertFingerprint = customCertFingerprint,
                     proxmoxRealm = proxmoxRealm,
                     proxmoxOtp = proxmoxOtp,
                     proxmoxUseApiToken = proxmoxUseApiToken
@@ -491,6 +512,86 @@ fun ServiceLoginScreen(
                     )
                 }
             }
+
+            Surface(
+                color = if (allowHttp) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 14.dp)
+            ) {
+                androidx.compose.foundation.layout.Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Default.Warning,
+                        contentDescription = null,
+                        tint = if (allowHttp) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.login_allow_http),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = if (allowHttp) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = if (allowHttp) "Cleartext HTTP enabled (insecure)" else "HTTPS enforced (recommended)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (allowHttp) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = allowHttp,
+                        onCheckedChange = { checked ->
+                            if (checked) {
+                                showHttpWarningDialog = true
+                            } else {
+                                allowHttp = false
+                            }
+                        }
+                    )
+                }
+            }
+
+            if (showHttpWarningDialog) {
+                AlertDialog(
+                    onDismissRequest = { showHttpWarningDialog = false },
+                    icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                    title = { Text(stringResource(R.string.login_allow_http_warning_title)) },
+                    text = { Text(stringResource(R.string.login_allow_http_warning_message)) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            allowHttp = true
+                            showHttpWarningDialog = false
+                        }) {
+                            Text(stringResource(R.string.confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {
+                            showHttpWarningDialog = false
+                        }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    }
+                )
+            }
+
+            OutlinedTextField(
+                value = customCertFingerprint,
+                onValueChange = { customCertFingerprint = it },
+                label = { Text(stringResource(R.string.login_cert_fingerprint)) },
+                placeholder = { Text(stringResource(R.string.login_cert_fingerprint_hint)) },
+                leadingIcon = { Icon(Icons.Default.Key, contentDescription = stringResource(R.string.login_cert_fingerprint)) },
+                singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Next),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 14.dp),
+                shape = RoundedCornerShape(14.dp)
+            )
 
             if (
                 serviceType == ServiceType.PORTAINER ||

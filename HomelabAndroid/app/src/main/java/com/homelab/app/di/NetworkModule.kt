@@ -15,14 +15,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import javax.inject.Named
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -64,41 +59,12 @@ object NetworkModule {
     @Singleton
     @Named("insecure")
     fun provideInsecureOkHttpClient(
-        smartFallbackInterceptor: SmartFallbackInterceptor,
-        authInterceptor: AuthInterceptor,
-        debugLoggingInterceptor: DebugLoggingInterceptor,
-        htmlDetectionInterceptor: HtmlDetectionInterceptor
+        okHttpClient: OkHttpClient
     ): OkHttpClient {
-        val trustAllCerts = arrayOf<TrustManager>(
-            object : X509TrustManager {
-                override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-                override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-                override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
-            }
-        )
-
-        val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, trustAllCerts, SecureRandom())
-        val sslSocketFactory = sslContext.socketFactory
-        val trustManager = trustAllCerts.first() as X509TrustManager
-
-        val builder = OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
-            .addInterceptor(smartFallbackInterceptor)
-            .addInterceptor(authInterceptor)
-
-        if (BuildConfig.DEBUG) {
-            builder.addInterceptor(debugLoggingInterceptor)
-        }
-
-        builder.addInterceptor(htmlDetectionInterceptor)
-
-        return builder
-            .sslSocketFactory(sslSocketFactory, trustManager)
-            .hostnameVerifier { _, _ -> true }
-            .build()
+        // SECURITY REMEDIATION: The blind "trustAllCerts" TrustManager and "hostnameVerifier { true }"
+        // have been permanently removed. Instance-specific explicit certificate pinning and custom CA
+        // validation are handled via HomelabCertificateTrust and TlsClientSelector.
+        return okHttpClient.newBuilder().build()
     }
 
     @Provides
@@ -107,20 +73,6 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl("https://placeholder.local/")
             .callFactory(callFactory)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    @Named("insecure")
-    fun provideInsecureRetrofit(
-        @Named("insecure") okHttpClient: OkHttpClient,
-        json: Json
-    ): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://placeholder.local/")
-            .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
     }

@@ -14,18 +14,19 @@ class DebugLoggingInterceptor @Inject constructor() : Interceptor {
         val startNs = System.nanoTime()
         val tag = extractServiceTag(request.url.host)
 
-        Logger.net(tag, "--> ${request.method} ${request.url}")
+        val sanitizedUrl = com.homelab.app.data.security.LogSanitizer.sanitizeUrl(request.url)
+        Logger.net(tag, "--> ${request.method} $sanitizedUrl")
 
         val response = try {
             chain.proceed(request)
         } catch (e: Exception) {
-            Logger.e(tag, "x ${request.method} ${request.url}", e)
+            Logger.e(tag, "x ${request.method} $sanitizedUrl", e)
             throw e
         }
 
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
         val contentType = response.header("Content-Type") ?: "unknown"
-        val msg = "<-- ${response.code} ${request.method} ${request.url} (${tookMs}ms, $contentType)"
+        val msg = "<-- ${response.code} ${request.method} $sanitizedUrl (${tookMs}ms, $contentType)"
         if (response.code >= 400) {
             Logger.w(tag, msg)
         } else {

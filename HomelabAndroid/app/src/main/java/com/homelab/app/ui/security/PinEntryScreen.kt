@@ -107,6 +107,14 @@ fun PinEntryScreen(
     onPinComplete: (String) -> Unit
 ) {
     var pin by remember { mutableStateOf("") }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    DisposableEffect(Unit) {
+        val window = (context as? android.app.Activity)?.window
+        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose {
+            window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        }
+    }
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     val shakeOffset = remember { Animatable(0f) }

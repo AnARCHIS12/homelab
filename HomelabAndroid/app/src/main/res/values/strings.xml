@@ -208,6 +208,11 @@
     <string name="login_require_valid_tls">Require valid TLS certificate</string>
     <string name="login_tls_permissive">TLS permissive</string>
     <string name="login_tls_strict">TLS strict</string>
+    <string name="login_allow_http">Allow cleartext HTTP</string>
+    <string name="login_allow_http_warning_title">Security Warning</string>
+    <string name="login_allow_http_warning_message">HTTP traffic is unencrypted. Anyone on your network can intercept passwords, tokens, and sensitive data. Are you sure you want to enable cleartext HTTP for this instance?</string>
+    <string name="login_cert_fingerprint">Certificate SHA-256 Fingerprint (optional)</string>
+    <string name="login_cert_fingerprint_hint">64-character hex hash to pin certificate</string>
 
     <!-- Settings Screen -->
     <string name="settings_title">Settings</string>

@@ -47,7 +47,8 @@ enum class LanguageMode(val code: String, val flag: String) {
 
 @Singleton
 class LocalPreferencesRepository @Inject constructor(
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    val pinSecurityManager: com.homelab.app.data.security.PinSecurityManager
 ) {
     private val dataStore = context.dataStore
 
@@ -55,7 +56,6 @@ class LocalPreferencesRepository @Inject constructor(
     private val LANG_KEY = stringPreferencesKey("language_mode")
     private val HIDDEN_SERVICES_KEY = stringPreferencesKey("hidden_services")
     private val SERVICE_ORDER_KEY = stringPreferencesKey("service_order")
-    private val PIN_KEY = stringPreferencesKey("app_pin")
     private val BIOMETRIC_KEY = booleanPreferencesKey("biometric_enabled")
     private val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
     private val BESZEL_SHOW_CPU_KEY = booleanPreferencesKey("beszel_show_cpu")
@@ -541,15 +541,12 @@ class LocalPreferencesRepository @Inject constructor(
 
     // PIN & Biometric
 
-    val appPin: Flow<String?> = dataStore.data
-        .catch { exception ->
-            if (exception is IOException) {
-                emit(emptyPreferences())
-            } else {
-                throw exception
-            }
-        }
-        .map { preferences -> preferences[PIN_KEY] }
+    val appPin: Flow<String?> = pinSecurityManager.isPinSet
+        .map { if (it) "SET" else null }
+
+    val isPinSet: Flow<Boolean> = pinSecurityManager.isPinSet
+
+    val pinLockoutRemainingSeconds: Flow<Long> = pinSecurityManager.lockoutRemainingSeconds
 
     val biometricEnabled: Flow<Boolean> = dataStore.data
         .catch { exception ->
@@ -572,9 +569,11 @@ class LocalPreferencesRepository @Inject constructor(
         .map { preferences -> preferences[ONBOARDING_COMPLETED_KEY] ?: false }
 
     suspend fun savePin(pin: String) {
-        dataStore.edit { preferences ->
-            preferences[PIN_KEY] = pin
-        }
+        pinSecurityManager.savePin(pin)
+    }
+
+    suspend fun verifyPin(pin: String): com.homelab.app.data.security.PinVerificationResult {
+        return pinSecurityManager.verifyPin(pin)
     }
 
     suspend fun setBiometricEnabled(enabled: Boolean) {
@@ -590,8 +589,8 @@ class LocalPreferencesRepository @Inject constructor(
     }
 
     suspend fun clearSecurity() {
+        pinSecurityManager.clearPin()
         dataStore.edit { preferences ->
-            preferences.remove(PIN_KEY)
             preferences.remove(BIOMETRIC_KEY)
         }
     }

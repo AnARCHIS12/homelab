@@ -53,8 +53,8 @@ class SettingsViewModel @Inject constructor(
     private val _appIconApplying = MutableStateFlow(false)
     val appIconApplying: StateFlow<Boolean> = _appIconApplying
 
-    private val updateManifestUrl = "https://raw.githubusercontent.com/JohnnWi/homelab-project/main/app-version.json"
-    private val defaultUpdateUrl = "https://github.com/JohnnWi/homelab-project/releases"
+    private val updateManifestUrl = "https://raw.githubusercontent.com/AnARCHIS12/homelab/main/app-version.json"
+    private val defaultUpdateUrl = "https://github.com/AnARCHIS12/homelab/releases"
     private val updateCheckIntervalMs = 15 * 60 * 1000L
 
     val instancesByType: StateFlow<Map<ServiceType, List<ServiceInstance>>> = servicesRepository.instancesByType
@@ -85,19 +85,10 @@ class SettingsViewModel @Inject constructor(
     val biometricEnabled: StateFlow<Boolean> = localPreferencesRepository.biometricEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val isPinSet: StateFlow<Boolean> = localPreferencesRepository.appPin
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-        .let { flow ->
-            kotlinx.coroutines.flow.combine(flow, kotlinx.coroutines.flow.flowOf(Unit)) { pin, _ -> pin != null }
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-        }
-
-    private val _storedPin = MutableStateFlow<String?>(null)
+    val isPinSet: StateFlow<Boolean> = localPreferencesRepository.isPinSet
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init {
-        viewModelScope.launch {
-            localPreferencesRepository.appPin.collect { _storedPin.value = it }
-        }
         viewModelScope.launch {
             checkForUpdateBanner(force = false)
         }
@@ -169,7 +160,9 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun verifyPin(pin: String): Boolean {
-        return _storedPin.value == pin
+        return kotlinx.coroutines.runBlocking {
+            localPreferencesRepository.verifyPin(pin) is com.homelab.app.data.security.PinVerificationResult.Success
+        }
     }
 
     fun clearSecurity() {

@@ -3,115 +3,164 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Homelab Privacy Policy</title>
+  <title>Privacy Policy - Homelab</title>
+  <meta name="description" content="Privacy Policy for Homelab native Android application. 100% private, zero cloud, zero telemetry.">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      color-scheme: light dark;
-      --bg: #0f172a;
-      --card: #111c33;
-      --text: #e5edf8;
-      --muted: #9fb0c8;
-      --accent: #38bdf8;
-    }
-
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top left, #1e3a5f, var(--bg) 42%);
-      color: var(--text);
-      font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    main {
+    .legal-content {
       max-width: 820px;
-      margin: 0 auto;
-      padding: 56px 22px;
+      margin: 40px auto 80px;
     }
-
-    section {
-      background: color-mix(in srgb, var(--card) 86%, transparent);
-      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-      border-radius: 24px;
-      padding: 34px;
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    .legal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 48px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
     }
-
-    h1, h2 {
-      line-height: 1.15;
-      margin: 0 0 16px;
+    .legal-card h1 {
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
     }
-
-    h1 {
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      letter-spacing: -0.04em;
+    .legal-card h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin: 36px 0 12px;
+      letter-spacing: -0.01em;
     }
-
-    h2 {
-      color: var(--accent);
-      font-size: 1.1rem;
-      margin-top: 30px;
+    .legal-card p, .legal-card li {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 16px;
     }
-
-    p, li {
-      color: var(--muted);
+    .legal-card ul {
+      margin-left: 24px;
+      margin-bottom: 20px;
     }
-
-    a {
-      color: var(--accent);
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      transition: color 0.2s ease;
     }
-
-    .updated {
-      color: var(--text);
-      font-weight: 600;
+    .back-link:hover {
+      color: var(--accent-cyan);
     }
   </style>
 </head>
 <body>
-  <main>
-    <section>
+
+  <!-- Ambient Light Effects -->
+  <div class="bg-ambient">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+  </div>
+  <div class="bg-grid"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-brand">
+        <img src="assets/logo.png" alt="Homelab Logo" class="nav-logo">
+        <span>Homelab</span>
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-secondary btn-sm">
+          <span>Back to Landing Page</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container legal-content">
+    <a href="index.html" class="back-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      <span>Back to Homelab Home</span>
+    </a>
+
+    <article class="legal-card">
+      <div style="margin-bottom: 12px;">
+        <span class="badge badge-emerald">Privacy Policy</span>
+      </div>
       <h1>Homelab Privacy Policy</h1>
-      <p class="updated">Last updated: May 6, 2026</p>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px;">Last updated: September 12, 2026</p>
 
       <p>
-        Homelab is a client app for connecting to self-hosted services configured by the user.
-        The app does not provide hosted accounts and does not operate a backend service for user data.
+        Homelab is a native, free, open-source Android application designed for monitoring and managing self-hosted infrastructure. 
+        Privacy, user sovereignty, and local control are foundational to this project. We do not operate a cloud infrastructure, we do not require accounts, and we never touch your data.
       </p>
 
-      <h2>Data Stored On Your Device</h2>
+      <h2>1. Zero Cloud Backend & No User Accounts</h2>
       <p>
-        Service URLs, labels, credentials, API keys, tokens, preferences, and backup data are stored locally
-        on your device. Credentials are used only to connect to the services you configure.
+        The application operates entirely as a local client. There is no Homelab-hosted server, database, or proxy. 
+        No account creation is required, and no user profiles are generated or maintained.
       </p>
 
-      <h2>Network Connections</h2>
+      <h2>2. Data Stored Exclusively on Your Device</h2>
       <p>
-        Homelab connects to the server URLs that you enter in the app. Data returned by those services is
-        displayed in the app so you can monitor and manage your own infrastructure.
+        All information entered into the application—including server hostnames, IP addresses, ports, labels, API tokens, passwords, and custom preferences—is stored locally on your device.
+      </p>
+      <ul>
+        <li><strong>Hardware-Backed Secret Storage:</strong> Sensitive credentials (such as API keys and basic auth passwords) are encrypted using AES-256-GCM via the Android KeyStore (hardware-backed TEE / StrongBox).</li>
+        <li><strong>PIN & Biometric Protection:</strong> PIN codes are salted and hashed with PBKDF2-HMAC-SHA256. Biometric authentication remains within the secure enclave of your Android hardware.</li>
+        <li><strong>Screenshot Protection:</strong> Sensitive screens enforce Android’s <code>FLAG_SECURE</code> to prevent background task snapshot capture.</li>
+      </ul>
+
+      <h2>3. Direct Network Connections</h2>
+      <p>
+        Homelab connects directly to the servers, IP addresses, and domain names that you explicitly configure. 
+        Traffic flows strictly between your Android device and your self-hosted services (via local Wi-Fi, WireGuard, Tailscale, or HTTPS reverse proxy). Homelab never routes, inspects, or logs your traffic.
       </p>
 
-      <h2>Analytics And Tracking</h2>
+      <h2>4. Zero Telemetry, Analytics, or Advertising</h2>
       <p>
-        Homelab does not include advertising tracking and does not sell personal data. The app does not
-        collect analytics through a Homelab-operated backend.
+        Homelab does not contain:
+      </p>
+      <ul>
+        <li>Any advertising SDKs or tracking pixels.</li>
+        <li>Any crash-reporting telemetry services (e.g. Firebase Crashlytics).</li>
+        <li>Any behavioral or analytics tracking tools.</li>
+        <li>Any data brokering or monetized telemetry.</li>
+      </ul>
+
+      <h2>5. Backups & User Ownership</h2>
+      <p>
+        When you generate a backup from within Homelab, the exported file is stored directly on your phone's storage. Encrypted backups use industry-standard encryption requiring a password chosen by you. You have 100% control over the storage, transfer, and deletion of your backup files.
       </p>
 
-      <h2>Backups</h2>
+      <h2>6. 100% Free Forever & Zero Donations</h2>
       <p>
-        If you create or import a backup, that file is controlled by you. Keep backups private because they
-        may contain service configuration and credentials.
+        Homelab is released under the <strong>Apache License 2.0</strong>. The project does not sell software, does not feature in-app purchases, and does not accept or request donations.
       </p>
 
-      <h2>Third-Party Services</h2>
+      <h2>7. Questions & Issues</h2>
       <p>
-        Homelab can connect to third-party and open-source services that you host or control. Those services
-        have their own privacy and security behavior, independent of Homelab.
+        If you have questions or concerns regarding privacy, security, or data handling in Homelab, you can inspect the full source code or open an issue on GitHub:
       </p>
-
-      <h2>Contact</h2>
       <p>
-        For privacy questions, open an issue on the project repository:
-        <a href="https://github.com/JohnnWi/homelab-project/issues">GitHub Issues</a>.
+        <a href="https://github.com/AnARCHIS12/homelab/issues" target="_blank" rel="noopener" style="color: var(--accent-cyan); font-weight: 600;">GitHub Issues Repository</a>
       </p>
-    </section>
+    </article>
   </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 Homelab Project. Licensed under Apache 2.0.</div>
+        <div>100% Free · Zero Telemetry · Local-First</div>
+      </div>
+    </div>
+  </footer>
+
 </body>
 </html>
