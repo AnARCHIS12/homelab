@@ -115,7 +115,7 @@ class ServicesRepository @Inject constructor(
             val reachable = withContext(Dispatchers.IO) {
                 val baseUrl = instance.url.trimEnd('/').takeIf { it.isNotBlank() } ?: return@withContext false
                 val pathsToTry = when (instance.type) {
-                    ServiceType.PIHOLE -> listOf("/api/info/version", "/admin/index.php", "", "/admin/api.php")
+                    ServiceType.PIHOLE -> listOf("/api/info/version", "/admin/index.php", "/api/auth", "/admin/api.php", "")
                     ServiceType.ADGUARD_HOME -> listOf("/control/status", "/control/", "")
                     ServiceType.BESZEL -> listOf("/api/health", "/api/collections/systems/records?perPage=1", "")
                     ServiceType.DOCKHAND -> listOf("/api/environments", "/api/dashboard/stats", "/api/containers", "")
@@ -124,9 +124,9 @@ class ServicesRepository @Inject constructor(
                     ServiceType.GITEA -> listOf("/api/v1/version", "")
                     ServiceType.HEALTHCHECKS -> listOf("/api/v3/checks/", "/api/v1/checks/", "")
                     ServiceType.NGINX_PROXY_MANAGER -> listOf("/api/", "")
-                    ServiceType.JELLYSTAT -> listOf("/api/getStats", "")
+                    ServiceType.JELLYSTAT -> listOf("/stats/getViewsByLibraryType", "/api/getStats", "")
                     ServiceType.PLEX -> listOf("/identity", "")
-                    ServiceType.PATCHMON -> listOf("/api/v1/status", "")
+                    ServiceType.PATCHMON -> listOf("/health", "/api/v1/openapi.json", "/api/v1/api/hosts", "")
                     ServiceType.PTERODACTYL -> listOf("/api/application/users", "/api/client", "")
                     ServiceType.CALAGOPUS -> listOf("/api/v1/health", "")
                     ServiceType.RADARR, ServiceType.SONARR -> listOf("/api/v3/system/status", "/api/v3/health", "")

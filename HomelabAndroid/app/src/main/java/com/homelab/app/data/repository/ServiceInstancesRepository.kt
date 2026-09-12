@@ -5,6 +5,7 @@ import com.homelab.app.data.local.dao.ServiceInstanceDao
 import com.homelab.app.data.local.entity.ServiceInstanceEntity
 import com.homelab.app.data.security.InstanceCredentials
 import com.homelab.app.data.security.SecureCredentialsStore
+import com.homelab.app.data.security.ServiceUrlNormalizer
 import com.homelab.app.data.security.UrlSecurityValidator
 import com.homelab.app.domain.model.PiHoleAuthMode
 import com.homelab.app.domain.model.ServiceInstance
@@ -276,33 +277,11 @@ private fun ServiceInstance.toEntity(): ServiceInstanceEntity {
 }
 
 private fun normalizeUrl(raw: String, type: ServiceType? = null, allowHttp: Boolean = false): String {
-    return try {
-        val clean = UrlSecurityValidator.validateAndNormalizeUrl(raw, allowHttp)
-        when (type) {
-            ServiceType.UNIFI_NETWORK -> stripKnownUnifiApiPath(clean)
-            ServiceType.PANGOLIN -> stripKnownPangolinApiPath(clean)
-            ServiceType.UPTIME_KUMA -> stripKnownUptimeKumaApiPath(clean)
-            else -> clean
-        }
-    } catch (_: Exception) {
-        var clean = raw.trim()
-        clean = clean.trimEnd { it == ')' || it == ']' || it == '}' || it == ',' || it == ';' }
-        if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
-            clean = "https://$clean"
-        }
-        val withoutSlash = clean.replace(Regex("/+$"), "")
-        when (type) {
-            ServiceType.PANGOLIN -> stripKnownPangolinApiPath(withoutSlash)
-            ServiceType.UPTIME_KUMA -> stripKnownUptimeKumaApiPath(withoutSlash)
-            else -> withoutSlash
-        }
-    }
+    return ServiceUrlNormalizer.normalizeUrl(raw, type, allowHttp)
 }
 
 private fun normalizeOptionalUrl(raw: String?, type: ServiceType? = null, allowHttp: Boolean = false): String? {
-    if (raw.isNullOrBlank()) return null
-    val normalized = normalizeUrl(raw, type, allowHttp)
-    return normalized.ifBlank { null }
+    return ServiceUrlNormalizer.normalizeOptionalUrl(raw, type, allowHttp)
 }
 
 private fun normalizeInstance(instance: ServiceInstance): ServiceInstance {
@@ -312,45 +291,4 @@ private fun normalizeInstance(instance: ServiceInstance): ServiceInstance {
         return instance
     }
     return instance.copy(url = normalizedUrl, fallbackUrl = normalizedFallback)
-}
-
-private fun stripKnownUnifiApiPath(raw: String): String {
-    return runCatching {
-        val uri = URI(raw)
-        val path = uri.rawPath.orEmpty()
-        if (!isKnownUnifiApiPath(path)) return@runCatching raw
-        URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
-    }.getOrDefault(raw)
-}
-
-private fun isKnownUnifiApiPath(path: String): Boolean {
-    val normalized = path.trimEnd('/')
-    return normalized == "/proxy/network/integration/v1" ||
-        normalized.startsWith("/proxy/network/integration/v1/") ||
-        normalized == "/v1" ||
-        normalized.startsWith("/v1/")
-}
-
-private fun stripKnownPangolinApiPath(raw: String): String {
-    return runCatching {
-        val uri = URI(raw)
-        val path = uri.rawPath.orEmpty().trimEnd('/')
-        if (path == "/api/v1" || path == "/api" || path == "/v1") {
-            URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
-        } else {
-            raw
-        }
-    }.getOrDefault(raw)
-}
-
-private fun stripKnownUptimeKumaApiPath(raw: String): String {
-    return runCatching {
-        val uri = URI(raw)
-        val path = uri.rawPath.orEmpty().trimEnd('/')
-        if (path == "/metrics" || path == "/dashboard" || path.startsWith("/dashboard/") || path.startsWith("/status")) {
-            URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
-        } else {
-            raw
-        }
-    }.getOrDefault(raw)
 }

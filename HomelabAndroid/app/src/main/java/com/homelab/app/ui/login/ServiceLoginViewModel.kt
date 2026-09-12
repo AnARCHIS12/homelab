@@ -37,6 +37,7 @@ import com.homelab.app.domain.model.PiHoleAuthMode
 import com.homelab.app.domain.model.ServiceInstance
 import com.homelab.app.util.ErrorHandler
 import com.homelab.app.util.ServiceType
+import com.homelab.app.data.security.ServiceUrlNormalizer
 import com.homelab.app.data.security.UrlSecurityValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -123,8 +124,8 @@ class ServiceLoginViewModel @Inject constructor(
             val existing = _existingInstance.value
             val instanceId = existing?.id ?: UUID.randomUUID().toString()
             val normalizedLabel = label.trim().ifBlank { serviceType.displayName }
-            val cleanUrl = cleanUrl(url)
-            val cleanFallbackUrl = cleanOptionalUrl(fallbackUrl)
+            val cleanUrl = cleanUrl(url, serviceType, allowHttp)
+            val cleanFallbackUrl = cleanOptionalUrl(fallbackUrl, serviceType, allowHttp)
             val trimmedUsername = username.trim()
             val trimmedPassword = password.trim()
             val trimmedApiKey = apiKey.trim()
@@ -778,23 +779,14 @@ class ServiceLoginViewModel @Inject constructor(
         }
     }
 
-    private fun cleanUrl(url: String): String {
-        var clean = url.trim()
-        clean = clean.trimEnd { it == ')' || it == ']' || it == '}' || it == ',' || it == ';' }
-        if (!clean.startsWith("http://") &&
-            !clean.startsWith("https://") &&
-            !clean.startsWith("ws://") &&
-            !clean.startsWith("wss://")
-        ) {
-            clean = "https://$clean"
-        }
-        return clean.replace(Regex("/+$"), "")
+    private fun cleanUrl(url: String, type: ServiceType? = null, allowHttp: Boolean = false): String {
+        return ServiceUrlNormalizer.normalizeUrl(url, type, allowHttp)
     }
 
-    private fun cleanOptionalUrl(url: String): String? {
+    private fun cleanOptionalUrl(url: String, type: ServiceType? = null, allowHttp: Boolean = false): String? {
         val trimmed = url.trim()
         if (trimmed.isBlank()) return null
-        return cleanUrl(trimmed)
+        return ServiceUrlNormalizer.normalizeOptionalUrl(trimmed, type, allowHttp)
     }
 
     private fun canonicalUnifiUrl(url: String): String {
@@ -802,25 +794,8 @@ class ServiceLoginViewModel @Inject constructor(
         return if (lowered.contains("unifi.ui.com") || lowered.contains("api.ui.com")) {
             "https://api.ui.com"
         } else {
-            stripKnownUnifiApiPath(url)
+            ServiceUrlNormalizer.stripKnownServicePath(url, ServiceType.UNIFI_NETWORK)
         }
-    }
-
-    private fun stripKnownUnifiApiPath(raw: String): String {
-        return runCatching {
-            val uri = URI(raw)
-            val path = uri.rawPath.orEmpty()
-            if (!isKnownUnifiApiPath(path)) return@runCatching raw
-            URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
-        }.getOrDefault(raw)
-    }
-
-    private fun isKnownUnifiApiPath(path: String): Boolean {
-        val normalized = path.trimEnd('/')
-        return normalized == "/proxy/network/integration/v1" ||
-            normalized.startsWith("/proxy/network/integration/v1/") ||
-            normalized == "/v1" ||
-            normalized.startsWith("/v1/")
     }
 
     fun clearError() {

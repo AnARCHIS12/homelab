@@ -2,6 +2,8 @@ package com.homelab.app.data.repository
 
 import com.homelab.app.data.remote.api.PlexApi
 import com.homelab.app.data.remote.TlsClientSelector
+import com.homelab.app.data.security.ServiceUrlNormalizer
+import com.homelab.app.util.ServiceType
 import com.homelab.app.data.remote.dto.plex.PlexDashboardData
 import com.homelab.app.data.remote.dto.plex.PlexHistoryItem
 import com.homelab.app.data.remote.dto.plex.PlexLibrary
@@ -255,11 +257,7 @@ class PlexRepository @Inject constructor(
     }
 
     private fun cleanUrl(raw: String): String {
-        var clean = raw.trim()
-        if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
-            clean = "https://$clean"
-        }
-        return clean.replace(Regex("/+$"), "") // remove trailing slash
+        return ServiceUrlNormalizer.normalizeUrl(raw, ServiceType.PLEX, allowHttp = true)
     }
 
     private fun symbolForLib(type: String): String {

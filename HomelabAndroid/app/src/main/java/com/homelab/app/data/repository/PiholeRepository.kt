@@ -2,8 +2,10 @@ package com.homelab.app.data.repository
 
 import com.homelab.app.data.remote.api.PiholeApi
 import com.homelab.app.data.remote.dto.pihole.*
+import com.homelab.app.data.security.ServiceUrlNormalizer
 import com.homelab.app.domain.model.PiHoleAuthMode
 import com.homelab.app.domain.model.ServiceInstance
+import com.homelab.app.util.ServiceType
 import kotlinx.serialization.json.*
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -68,7 +70,8 @@ class PiholeRepository @Inject constructor(
     }
 
     suspend fun authenticate(url: String, password: String, allowSelfSigned: Boolean = false): String {
-        val cleanUrl = url.trimEnd('/') + "/api/auth"
+        val base = ServiceUrlNormalizer.normalizeUrl(url, ServiceType.PIHOLE, allowHttp = true).trimEnd('/')
+        val cleanUrl = "$base/api/auth"
         var authFailure: Exception? = null
         try {
             val response = api.authenticate(
@@ -82,7 +85,7 @@ class PiholeRepository @Inject constructor(
         }
 
         val encodedSecret = java.net.URLEncoder.encode(password, Charsets.UTF_8.name())
-        val legacyUrl = "${url.trimEnd('/')}/admin/api.php?summaryRaw&auth=$encodedSecret"
+        val legacyUrl = "$base/admin/api.php?summaryRaw&auth=$encodedSecret"
         val legacyValid = try {
             when (val response = api.validateLegacyAuth(url = legacyUrl, allowSelfSigned = allowSelfSigned.toString())) {
                 is JsonObject -> response.isNotEmpty()
