@@ -1,0 +1,25 @@
+Categories:
+  - System
+License: Apache-2.0
+AuthorName: AnARCHIS12
+SourceCode: https://github.com/AnARCHIS12/homelab
+IssueTracker: https://github.com/AnARCHIS12/homelab/issues
+Changelog: https://github.com/AnARCHIS12/homelab/releases
+
+AutoName: Homelab
+
+RepoType: git
+Repo: https://github.com/AnARCHIS12/homelab.git
+
+Builds:
+  - versionName: 1.6.3
+    versionCode: 40
+    commit: v1.6.3
+    subdir: HomelabAndroid
+    gradle:
+      - yes
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.6.3
+CurrentVersionCode: 40
