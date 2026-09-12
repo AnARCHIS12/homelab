@@ -20,6 +20,7 @@ interface BeszelApi {
         @Header("X-Homelab-Service") service: String = "Beszel",
         @Header("X-Homelab-Bypass") bypass: String = "true",
         @Header("X-Homelab-Allow-Self-Signed") allowSelfSigned: String = "false",
+        @Header("X-Homelab-Instance-Id") instanceId: String? = null,
         @Body credentials: Map<String, String>
     ): BeszelAuthResponse
 

@@ -12,6 +12,10 @@ class HtmlDetectionInterceptor @Inject constructor() : Interceptor {
         val request = chain.request()
         val response = chain.proceed(request)
 
+        if (request.header(SKIP_HTML_DETECTION_HEADER) == "true") {
+            return response
+        }
+
         val contentType = response.header("Content-Type")?.lowercase()
         val isHtmlContentType = contentType?.contains("text/html") == true ||
             contentType?.contains("application/xhtml+xml") == true
@@ -46,5 +50,9 @@ class HtmlDetectionInterceptor @Inject constructor() : Interceptor {
         val parts = host.split(".")
         if (parts.size <= 1 || parts[0].all { it.isDigit() || it == ':' }) return "Network"
         return parts[0].replaceFirstChar { it.uppercase() }
+    }
+
+    companion object {
+        const val SKIP_HTML_DETECTION_HEADER = "X-Homelab-Skip-Html-Detection"
     }
 }

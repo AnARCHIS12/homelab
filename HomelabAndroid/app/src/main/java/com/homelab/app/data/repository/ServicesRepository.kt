@@ -1,5 +1,6 @@
 package com.homelab.app.data.repository
 
+import com.homelab.app.data.remote.HtmlDetectionInterceptor
 import com.homelab.app.data.remote.TlsClientSelector
 import com.homelab.app.domain.model.ServiceInstance
 import com.homelab.app.util.GlobalEventBus
@@ -116,6 +117,18 @@ class ServicesRepository @Inject constructor(
                 val pathsToTry = when (instance.type) {
                     ServiceType.PIHOLE -> listOf("/api/info/version", "/admin/index.php", "", "/admin/api.php")
                     ServiceType.ADGUARD_HOME -> listOf("/control/status", "/control/", "")
+                    ServiceType.BESZEL -> listOf("/api/health", "/api/collections/systems/records?perPage=1", "")
+                    ServiceType.DOCKHAND -> listOf("/api/environments", "/api/dashboard/stats", "/api/containers", "")
+                    ServiceType.DOCKMON -> listOf("/api/hosts", "/api/containers", "")
+                    ServiceType.PORTAINER -> listOf("/api/system/version", "/api/status", "/api/endpoints", "")
+                    ServiceType.GITEA -> listOf("/api/v1/version", "")
+                    ServiceType.HEALTHCHECKS -> listOf("/api/v3/checks/", "/api/v1/checks/", "")
+                    ServiceType.NGINX_PROXY_MANAGER -> listOf("/api/", "")
+                    ServiceType.JELLYSTAT -> listOf("/api/getStats", "")
+                    ServiceType.PLEX -> listOf("/identity", "")
+                    ServiceType.PATCHMON -> listOf("/api/v1/status", "")
+                    ServiceType.PTERODACTYL -> listOf("/api/application/users", "/api/client", "")
+                    ServiceType.CALAGOPUS -> listOf("/api/v1/health", "")
                     ServiceType.RADARR, ServiceType.SONARR -> listOf("/api/v3/system/status", "/api/v3/health", "")
                     ServiceType.LIDARR -> listOf("/api/v1/system/status", "/api/v1/health", "")
                     ServiceType.QBITTORRENT -> listOf("/api/v2/app/version", "/api/v2/app/buildInfo", "")
@@ -126,8 +139,6 @@ class ServicesRepository @Inject constructor(
                     ServiceType.FLARESOLVERR -> listOf("/health", "/v1", "")
                     ServiceType.LINUX_UPDATE -> listOf("/api/dashboard/stats", "")
                     ServiceType.TECHNITIUM -> listOf("/api/user/login", "/api/dashboard/stats/get", "")
-                    ServiceType.DOCKHAND -> listOf("/api/dashboard/stats", "/api/containers", "")
-                    ServiceType.DOCKMON -> listOf("/api/hosts", "/api/containers", "")
                     ServiceType.KOMODO -> listOf("", "/read/GetVersion")
                     ServiceType.MALTRAIL -> listOf("/counts", "/events", "")
                     ServiceType.UPTIME_KUMA -> listOf("/metrics", "")
@@ -142,7 +153,7 @@ class ServicesRepository @Inject constructor(
 
                 pathsToTry.any { path ->
                     runCatching {
-                        val reachabilityClient = tlsClientSelector.forAllowSelfSigned(instance.allowSelfSigned)
+                        val reachabilityClient = tlsClientSelector.clientForInstance(instance)
                             .newBuilder()
                             .connectTimeout(4, TimeUnit.SECONDS)
                             .readTimeout(4, TimeUnit.SECONDS)
@@ -153,8 +164,13 @@ class ServicesRepository @Inject constructor(
                             Request.Builder()
                                 .url(baseUrl + path)
                                 .addHeader("X-Homelab-Instance-Id", instance.id)
+                                .addHeader(HtmlDetectionInterceptor.SKIP_HTML_DETECTION_HEADER, "true")
                                 .build()
-                        ).execute().use { true }
+                        ).execute().use { response ->
+                            // Any HTTP response (2xx, 3xx, 4xx) indicates the server is alive and responding.
+                            // 502/503/504 means the reverse proxy or gateway cannot reach the upstream service.
+                            response.code in 200..499
+                        }
                     }.getOrDefault(false)
                 }
             }

@@ -20,7 +20,8 @@ class BeszelRepository @Inject constructor(
         email: String,
         password: String,
         fallbackUrl: String? = null,
-        allowSelfSigned: Boolean = false
+        allowSelfSigned: Boolean = false,
+        instanceId: String? = null
     ): String {
         val candidates = listOf(url, fallbackUrl.orEmpty())
             .mapNotNull { raw -> raw.trim().trimEnd('/').takeIf { it.isNotBlank() } }
@@ -32,6 +33,7 @@ class BeszelRepository @Inject constructor(
                 val response = api.authenticate(
                     url = cleanUrl,
                     allowSelfSigned = allowSelfSigned.toString(),
+                    instanceId = instanceId,
                     credentials = mapOf("identity" to email, "password" to password)
                 )
                 return response.token
@@ -65,32 +67,42 @@ class BeszelRepository @Inject constructor(
 
     suspend fun getSystemDetails(instanceId: String, systemId: String): BeszelSystemDetails? {
         val filter = "system='$systemId'"
-        val response = api.getSystemDetails(instanceId = instanceId, filter = filter, limit = 1)
-        return response.items.firstOrNull()
+        return runCatching {
+            val response = api.getSystemDetails(instanceId = instanceId, filter = filter, limit = 1)
+            response.items.firstOrNull()
+        }.getOrNull()
     }
 
     suspend fun getSystemRecords(instanceId: String, systemId: String, limit: Int = 60): List<BeszelSystemRecord> {
         val filter = "system='$systemId'"
-        val response = api.getSystemRecords(instanceId = instanceId, filter = filter, limit = limit)
-        return response.items
+        return runCatching {
+            val response = api.getSystemRecords(instanceId = instanceId, filter = filter, limit = limit)
+            response.items
+        }.getOrDefault(emptyList())
     }
 
     suspend fun getSmartDevices(instanceId: String, systemId: String, limit: Int = 10): List<BeszelSmartDevice> {
         val filter = "system='$systemId'"
-        val response = api.getSmartDevices(instanceId = instanceId, filter = filter, limit = limit)
-        return response.items
+        return runCatching {
+            val response = api.getSmartDevices(instanceId = instanceId, filter = filter, limit = limit)
+            response.items
+        }.getOrDefault(emptyList())
     }
 
     suspend fun getContainers(instanceId: String, systemId: String): List<BeszelContainerRecord> {
         val filter = "system='$systemId'"
-        val response = api.getContainers(instanceId = instanceId, filter = filter)
-        return response.items
+        return runCatching {
+            val response = api.getContainers(instanceId = instanceId, filter = filter)
+            response.items
+        }.getOrDefault(emptyList())
     }
 
     suspend fun getContainerStats(instanceId: String, systemId: String, limit: Int = 240): List<BeszelContainerStatsRecord> {
         val filter = "system='$systemId'"
-        val response = api.getContainerStats(instanceId = instanceId, filter = filter, limit = limit)
-        return response.items
+        return runCatching {
+            val response = api.getContainerStats(instanceId = instanceId, filter = filter, limit = limit)
+            response.items
+        }.getOrDefault(emptyList())
     }
 
     suspend fun getContainerLogs(instanceId: String, token: String, systemId: String, containerId: String): String {
@@ -147,7 +159,8 @@ class BeszelRepository @Inject constructor(
             email = email,
             password = password,
             fallbackUrl = instance.fallbackUrl,
-            allowSelfSigned = instance.allowSelfSigned
+            allowSelfSigned = instance.allowSelfSigned,
+            instanceId = instance.id
         )
         serviceInstancesRepository.saveInstance(instance.copy(token = newToken))
         return newToken

@@ -109,7 +109,8 @@ class AuthInterceptor @Inject constructor(
             effectiveInstance.type == ServiceType.BESZEL &&
             shouldAttemptBeszelReauth(response) &&
             bypassHeader != "true" &&
-            instanceIdHeader != null
+            instanceIdHeader != null &&
+            isBeszelCoreAuthRequest(request)
         ) {
             globalEventBus.emitAuthError(instanceIdHeader)
         }
@@ -324,6 +325,11 @@ class AuthInterceptor @Inject constructor(
             lowered.contains("auth") ||
             lowered.contains("unauthorized") ||
             lowered.contains("forbidden")
+    }
+
+    private fun isBeszelCoreAuthRequest(request: okhttp3.Request): Boolean {
+        val path = request.url.encodedPath
+        return path.contains("api/collections/systems")
     }
 
     private fun addAuthHeaders(
