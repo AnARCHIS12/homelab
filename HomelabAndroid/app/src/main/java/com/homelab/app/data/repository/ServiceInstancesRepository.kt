@@ -278,14 +278,19 @@ private fun ServiceInstance.toEntity(): ServiceInstanceEntity {
 private fun normalizeUrl(raw: String, type: ServiceType? = null, allowHttp: Boolean = false): String {
     return try {
         val clean = UrlSecurityValidator.validateAndNormalizeUrl(raw, allowHttp)
-        if (type == ServiceType.UNIFI_NETWORK) stripKnownUnifiApiPath(clean) else clean
+        when (type) {
+            ServiceType.UNIFI_NETWORK -> stripKnownUnifiApiPath(clean)
+            ServiceType.PANGOLIN -> stripKnownPangolinApiPath(clean)
+            else -> clean
+        }
     } catch (_: Exception) {
         var clean = raw.trim()
         clean = clean.trimEnd { it == ')' || it == ']' || it == '}' || it == ',' || it == ';' }
         if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
             clean = "https://$clean"
         }
-        clean.replace(Regex("/+$"), "")
+        val withoutSlash = clean.replace(Regex("/+$"), "")
+        if (type == ServiceType.PANGOLIN) stripKnownPangolinApiPath(withoutSlash) else withoutSlash
     }
 }
 
@@ -319,4 +324,16 @@ private fun isKnownUnifiApiPath(path: String): Boolean {
         normalized.startsWith("/proxy/network/integration/v1/") ||
         normalized == "/v1" ||
         normalized.startsWith("/v1/")
+}
+
+private fun stripKnownPangolinApiPath(raw: String): String {
+    return runCatching {
+        val uri = URI(raw)
+        val path = uri.rawPath.orEmpty().trimEnd('/')
+        if (path == "/api/v1" || path == "/api" || path == "/v1") {
+            URI(uri.scheme, uri.userInfo, uri.host, uri.port, null, null, null).toString()
+        } else {
+            raw
+        }
+    }.getOrDefault(raw)
 }

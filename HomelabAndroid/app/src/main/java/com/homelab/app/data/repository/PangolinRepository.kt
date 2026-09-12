@@ -61,17 +61,46 @@ class PangolinRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             val token = cleanToken(apiKey)
             val cleanedOrgId = orgId?.trim().orEmpty()
-            val path = if (cleanedOrgId.isNotEmpty()) "v1/org/$cleanedOrgId/sites?pageSize=1&page=1" else "v1/orgs"
-            val request = Request.Builder()
-                .url("${cleanUrl(url)}/$path")
-                .addHeader("Authorization", "Bearer $token")
-                .build()
+            val rawBase = cleanUrl(url).removeSuffix("/api/v1").removeSuffix("/api").removeSuffix("/")
+            val candidatePaths = if (cleanedOrgId.isNotEmpty()) {
+                listOf(
+                    "api/v1/org/$cleanedOrgId/sites?pageSize=1&page=1",
+                    "v1/org/$cleanedOrgId/sites?pageSize=1&page=1"
+                )
+            } else {
+                listOf("api/v1/orgs", "v1/orgs")
+            }
 
-            tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    throw IllegalStateException("Pangolin authentication failed")
+            var lastError: Exception? = null
+            for (path in candidatePaths) {
+                val request = Request.Builder()
+                    .url("$rawBase/$path")
+                    .addHeader("Authorization", "Bearer $token")
+                    .addHeader("Accept", "application/json")
+                    .build()
+
+                try {
+                    val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
+                    response.use { resp ->
+                        val contentType = resp.header("Content-Type")?.lowercase().orEmpty()
+                        val isHtml = contentType.contains("text/html") || contentType.contains("application/xhtml+xml")
+                        if (isHtml) {
+                            throw IllegalStateException("Le serveur a renvoyé une page HTML au lieu de JSON. Vérifiez l'adresse de votre instance Pangolin.")
+                        }
+                        if (resp.code in 401..403) {
+                            throw IllegalStateException("Clé d'API Pangolin invalide ou non autorisée (HTTP ${resp.code}).")
+                        }
+                        if (resp.isSuccessful) {
+                            return@withContext
+                        } else {
+                            throw IllegalStateException("Pangolin a retourné une erreur HTTP ${resp.code}.")
+                        }
+                    }
+                } catch (e: Exception) {
+                    lastError = e
                 }
             }
+            throw lastError ?: IllegalStateException("Pangolin authentication failed")
         }
     }
 

@@ -147,9 +147,9 @@ class ServicesRepository @Inject constructor(
                     ServiceType.PANGOLIN -> {
                         val orgId = instance.username?.trim().orEmpty()
                         if (orgId.isNotEmpty()) {
-                            listOf("/v1/org/$orgId/sites?pageSize=1&page=1", "/v1/orgs", "/v1/openapi.json", "")
+                            listOf("/api/v1", "/api/v1/org/$orgId/sites?pageSize=1&page=1", "/api/v1/orgs", "/v1/orgs", "")
                         } else {
-                            listOf("/v1/orgs", "/v1/openapi.json", "/v1/", "")
+                            listOf("/api/v1", "/api/v1/orgs", "/v1/orgs", "")
                         }
                     }
                     ServiceType.WAKAPI -> listOf("/api/health", "/api/summary", "")
