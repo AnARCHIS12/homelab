@@ -31,12 +31,12 @@ enum class ThemeMode {
     }
 }
 
-enum class LanguageMode(val code: String, val flag: String) {
-    ITALIAN("it", "🇮🇹"),
-    ENGLISH("en", "🇬🇧"),
-    FRENCH("fr", "🇫🇷"),
-    SPANISH("es", "🇪🇸"),
-    GERMAN("de", "🇩🇪");
+enum class LanguageMode(val code: String, val shortCode: String, val nativeName: String) {
+    ITALIAN("it", "IT", "Italiano"),
+    ENGLISH("en", "EN", "English"),
+    FRENCH("fr", "FR", "Français"),
+    SPANISH("es", "ES", "Español"),
+    GERMAN("de", "DE", "Deutsch");
 
     companion object {
         fun fromCode(code: String?): LanguageMode {

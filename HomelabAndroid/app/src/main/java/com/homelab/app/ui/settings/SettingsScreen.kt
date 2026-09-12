@@ -362,15 +362,17 @@ fun SettingsScreen(
                             val isSelected = languageMode == lang
                             Surface(
                                 shape = CircleShape,
-                                color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
-                                modifier = Modifier.size(56.dp),
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerHigh,
+                                contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+                                modifier = Modifier.size(52.dp),
                                 onClick = { viewModel.setLanguageMode(lang) }
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Text(
-                                        text = lang.flag,
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        modifier = if (!isSelected) Modifier.alpha(0.5f) else Modifier
+                                        text = lang.shortCode,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             }
@@ -761,7 +763,7 @@ fun SettingsScreen(
                     ContactChip(
                         label = stringResource(R.string.settings_contact_repository),
                         iconUrl = "https://cdn.jsdelivr.net/gh/selfhst/icons/png/github.png",
-                        onClick = { uriHandler.openUri("https://github.com/AnARCHIS12/homelab") },
+                        onClick = { uriHandler.openUri("https://github.com/AnARCHIS12") },
                         modifier = Modifier.weight(1f)
                     )
                 }

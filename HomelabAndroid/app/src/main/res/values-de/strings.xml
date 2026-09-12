@@ -272,8 +272,6 @@
     <string name="settings_update_dismiss">Ausblenden</string>
     <string name="update_popup_title">Update verfügbar</string>
     <string name="update_popup_body">Eine neue Version von Homelab ist verfügbar. Jetzt aktualisieren für die neuesten Funktionen.</string>
-    <string name="settings_contact_telegram">Telegram</string>
-    <string name="settings_contact_reddit">Reddit</string>
     <string name="settings_contact_repository">GitHub</string>
     <string name="settings_debug_label">Debug</string>
     <string name="settings_debug_logs_desc">Logs anzeigen, um Verbindungs- und Parsing-Probleme zu beheben.</string>

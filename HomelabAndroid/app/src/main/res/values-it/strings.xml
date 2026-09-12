@@ -279,8 +279,6 @@
     <string name="settings_update_dismiss">Nascondi</string>
     <string name="update_popup_title">Aggiornamento Disponibile</string>
     <string name="update_popup_body">Una nuova versione di Homelab è disponibile. Aggiorna ora per le ultime novità e miglioramenti.</string>
-    <string name="settings_contact_telegram">Telegram</string>
-    <string name="settings_contact_reddit">Reddit</string>
     <string name="settings_contact_repository">GitHub</string>
     <string name="settings_debug_label">Debug</string>
     <string name="settings_debug_logs_desc">Visualizza i log per risolvere problemi di connessione e parsing.</string>
