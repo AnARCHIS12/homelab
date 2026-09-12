@@ -26,8 +26,7 @@ class ServiceInstancesRepository @Inject constructor(
     private val secureCredentialsStore: SecureCredentialsStore
 ) {
     val allInstances: Flow<List<ServiceInstance>> = dao.observeAll().map { entities ->
-        val allCreds = secureCredentialsStore.getAllCredentials()
-        entities.map { it.toDomain(allCreds[it.id]) }
+        entities.map { it.toDomain() }
     }
 
     val instancesByType: Flow<Map<ServiceType, List<ServiceInstance>>> = allInstances.map { instances ->
@@ -53,27 +52,18 @@ class ServiceInstancesRepository @Inject constructor(
 
     suspend fun initialize() {
         migrateLegacyDataIfNeeded()
-        migrateRoomSecretsToKeystoreStoreIfNeeded()
         normalizeStoredInstancesIfNeeded()
         repairAllPreferredInstances()
     }
 
-    suspend fun getInstance(id: String): ServiceInstance? {
-        val entity = dao.getById(id) ?: return null
-        val creds = secureCredentialsStore.getCredentials(id)
-        return entity.toDomain(creds)
-    }
+    suspend fun getInstance(id: String): ServiceInstance? = dao.getById(id)?.toDomain()
 
     suspend fun getAllInstances(): List<ServiceInstance> {
-        val entities = dao.getAll()
-        val allCreds = secureCredentialsStore.getAllCredentials()
-        return entities.map { it.toDomain(allCreds[it.id]) }
+        return dao.getAll().map { it.toDomain() }
     }
 
     suspend fun getInstances(type: ServiceType): List<ServiceInstance> {
-        val entities = dao.getByType(type.name)
-        val allCreds = secureCredentialsStore.getAllCredentials()
-        return entities.map { it.toDomain(allCreds[it.id]) }
+        return dao.getByType(type.name).map { it.toDomain() }
     }
 
     suspend fun getPreferredInstance(type: ServiceType): ServiceInstance? {
@@ -102,8 +92,8 @@ class ServiceInstancesRepository @Inject constructor(
             )
         )
 
-        // 2. Save public metadata to Room with secrets stripped/cleared
-        dao.upsert(normalized.toMetadataEntity())
+        // 2. Save instance to Room database with full persistence fallback
+        dao.upsert(normalized.toEntity())
 
         val currentPreferred = settingsManager.preferredInstanceId(normalized.type).first()
         if (currentPreferred.isNullOrBlank()) {
@@ -165,8 +155,7 @@ class ServiceInstancesRepository @Inject constructor(
      */
     private suspend fun migrateRoomSecretsToKeystoreStoreIfNeeded() {
         val entities = dao.getAll()
-        var updated = false
-        val sanitizedEntities = entities.map { entity ->
+        entities.forEach { entity ->
             val hasPlaintextSecrets = entity.token.isNotBlank() ||
                 !entity.password.isNullOrBlank() ||
                 !entity.apiKey.isNullOrBlank() ||
@@ -189,22 +178,7 @@ class ServiceInstancesRepository @Inject constructor(
                         )
                     )
                 }
-                updated = true
-                entity.copy(
-                    token = "",
-                    password = null,
-                    apiKey = null,
-                    proxmoxCsrfToken = null,
-                    proxmoxOtp = null,
-                    piholePassword = null
-                )
-            } else {
-                entity
             }
-        }
-
-        if (updated) {
-            dao.upsertAll(sanitizedEntities)
         }
     }
 
@@ -251,45 +225,50 @@ class ServiceInstancesRepository @Inject constructor(
     }
 }
 
-private fun ServiceInstanceEntity.toDomain(credentials: InstanceCredentials?): ServiceInstance {
+private fun ServiceInstanceEntity.toDomain(credentials: InstanceCredentials? = null): ServiceInstance {
+    val effectiveToken = credentials?.token?.takeIf { it.isNotBlank() } ?: token
+    val effectivePassword = credentials?.password?.takeIf { it.isNotBlank() } ?: password
+    val effectiveApiKey = credentials?.apiKey?.takeIf { it.isNotBlank() } ?: apiKey
+    val effectiveProxmoxCsrf = credentials?.proxmoxCsrfToken?.takeIf { it.isNotBlank() } ?: proxmoxCsrfToken
+    val effectiveProxmoxOtp = credentials?.proxmoxOtp?.takeIf { it.isNotBlank() } ?: proxmoxOtp
+    val effectivePiholePassword = credentials?.piholePassword?.takeIf { it.isNotBlank() } ?: piholePassword
     return ServiceInstance(
         id = id,
         type = ServiceType.fromStoredName(type),
         label = label,
         url = url,
-        token = credentials?.token ?: token,
-        proxmoxCsrfToken = credentials?.proxmoxCsrfToken ?: proxmoxCsrfToken,
-        proxmoxOtp = credentials?.proxmoxOtp ?: proxmoxOtp,
+        token = effectiveToken,
+        proxmoxCsrfToken = effectiveProxmoxCsrf,
+        proxmoxOtp = effectiveProxmoxOtp,
         username = username,
-        apiKey = credentials?.apiKey ?: apiKey,
-        piholePassword = credentials?.piholePassword ?: piholePassword,
+        apiKey = effectiveApiKey,
+        piholePassword = effectivePiholePassword,
         piholeAuthMode = piholeAuthMode?.let(PiHoleAuthMode::valueOf),
         fallbackUrl = fallbackUrl,
         allowSelfSigned = allowSelfSigned,
-        password = credentials?.password ?: password,
+        password = effectivePassword,
         allowHttp = allowHttp,
         customCertFingerprint = customCertFingerprint,
         customCertificatePem = customCertificatePem
     )
 }
 
-private fun ServiceInstance.toMetadataEntity(): ServiceInstanceEntity {
+private fun ServiceInstance.toEntity(): ServiceInstanceEntity {
     return ServiceInstanceEntity(
         id = id,
         type = type.name,
         label = label.ifBlank { type.displayName },
         url = url,
-        // Strip sensitive credentials from Room entity:
-        token = "",
-        proxmoxCsrfToken = null,
-        proxmoxOtp = null,
+        token = token,
+        proxmoxCsrfToken = proxmoxCsrfToken,
+        proxmoxOtp = proxmoxOtp,
         username = username,
-        apiKey = null,
-        piholePassword = null,
+        apiKey = apiKey,
+        piholePassword = piholePassword,
         piholeAuthMode = piholeAuthMode?.name,
         fallbackUrl = fallbackUrl,
         allowSelfSigned = allowSelfSigned,
-        password = null,
+        password = password,
         allowHttp = allowHttp,
         customCertFingerprint = customCertFingerprint,
         customCertificatePem = customCertificatePem

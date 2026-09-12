@@ -29,8 +29,7 @@ interface BeszelApi {
         @Header("X-Homelab-Service") service: String = "Beszel",
         @Query("sort") sort: String = "-updated",
         @Query("perPage") perPage: Int = 50,
-        // Only fetch fields needed for the dashboard: identity + CPU/memory + disk (root + extra filesystems).
-        @Query("fields") fields: String = "id,name,host,status,info.cpu,info.mp,info.dp,info.efs",
+        @Query("fields") fields: String? = null,
         @Header("X-Homelab-Instance-Id") instanceId: String
     ): BeszelSystemsResponse
 

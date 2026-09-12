@@ -129,7 +129,8 @@ class KeystoreSecureCredentialsStore @Inject constructor(
             val jsonString = String(plaintext, Charsets.UTF_8)
             val decoded = json.decodeFromString<Map<String, InstanceCredentials>>(jsonString)
             inMemoryCache = decoded.toMutableMap()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Logger.e("SecureCredentialsStore", "Failed to load credentials from encrypted store: ${e.message}")
             inMemoryCache = mutableMapOf()
         }
     }
@@ -152,8 +153,13 @@ class KeystoreSecureCredentialsStore @Inject constructor(
             System.arraycopy(iv, 0, output, 5, IV_LENGTH)
             System.arraycopy(ciphertext, 0, output, HEADER_SIZE, ciphertext.size)
 
+            val parentDir = storeFile.parentFile ?: context.noBackupFilesDir
+            if (!parentDir.exists()) {
+                parentDir.mkdirs()
+            }
+
             // Atomic file write
-            val tempFile = File(context.noBackupFilesDir, "$STORE_FILE_NAME.tmp")
+            val tempFile = File(parentDir, "$STORE_FILE_NAME.tmp")
             FileOutputStream(tempFile).use { fos ->
                 fos.write(output)
                 fos.flush()
@@ -182,9 +188,8 @@ class KeystoreSecureCredentialsStore @Inject constructor(
                     .build()
                 keyGenerator.init(spec)
                 keyGenerator.generateKey()
-            } else {
-                (keyStore.getEntry(KEY_ALIAS, null) as KeyStore.SecretKeyEntry).secretKey
             }
+            (keyStore.getKey(KEY_ALIAS, null) as? SecretKey) ?: fallbackJvmKey()
         } catch (_: Throwable) {
             // Fallback for JVM host unit tests where AndroidKeyStore provider is absent
             fallbackJvmKey()
