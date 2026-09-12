@@ -1,0 +1,8 @@
+Homelab is a fast, 100% native Android dashboard designed for managing your self-hosted infrastructure.
+
+Key features:
+• Supports 34+ homelab services natively (Proxmox VE, Portainer, Pi-hole, AdGuard Home, Beszel, Technitium DNS, Nginx Proxy Manager, Gitea, Plex, Servarr suite, and more).
+• Zero cloud intermediaries, zero analytics, zero telemetry: communicates directly with your servers on LAN, VPN, or reverse proxy.
+• Hardware-backed credential encryption with Android KeyStore (AES-256-GCM).
+• Modern Material 3 UI with dark and light themes.
+• 100% free and open-source under Apache 2.0 license.

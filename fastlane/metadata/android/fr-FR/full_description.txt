@@ -1,0 +1,8 @@
+Homelab est un tableau de bord Android 100 % natif conçu pour gérer votre infrastructure auto-hébergée.
+
+Fonctionnalités clés :
+• Plus de 34 services homelab pris en charge nativement (Proxmox VE, Portainer, Pi-hole, AdGuard Home, Beszel, Technitium DNS, Nginx Proxy Manager, Gitea, Plex, suite Servarr, etc.).
+• Zéro intermédiaire cloud, zéro traqueur, zéro télémétrie : dialogue direct avec vos machines en Wi-Fi local, VPN ou reverse proxy.
+• Chiffrement matériel des identifiants et clés API via l'Android KeyStore (AES-256-GCM).
+• Interface moderne Material 3 avec thèmes sombre et clair.
+• 100 % gratuit et open source sous licence Apache 2.0.

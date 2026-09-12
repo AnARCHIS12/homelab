@@ -1,0 +1,1 @@
+Modern native all-in-one dashboard for self-hosted services and homelabs
