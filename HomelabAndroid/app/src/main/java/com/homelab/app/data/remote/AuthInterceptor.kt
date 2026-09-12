@@ -79,6 +79,11 @@ class AuthInterceptor @Inject constructor(
         request = requestBuilder.build()
         var response = chain.proceed(request)
 
+        // Reachability pings should never trigger re-authentication loops or emit auth errors
+        if (request.header(HtmlDetectionInterceptor.SKIP_HTML_DETECTION_HEADER) == "true") {
+            return response
+        }
+
         // Auto-retry for Beszel on auth failure (401 or 400 for PocketBase)
         if (effectiveInstance != null &&
             effectiveInstance.type == ServiceType.BESZEL &&

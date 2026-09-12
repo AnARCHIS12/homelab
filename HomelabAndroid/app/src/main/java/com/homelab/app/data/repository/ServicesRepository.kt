@@ -144,7 +144,14 @@ class ServicesRepository @Inject constructor(
                     ServiceType.UPTIME_KUMA -> listOf("/metrics", "")
                     ServiceType.UNIFI_NETWORK -> listOf("/proxy/network/integration/v1/sites", "/v1/sites", "")
                     ServiceType.CRAFTY_CONTROLLER -> listOf("/api/v2/servers", "/api/v2", "")
-                    ServiceType.PANGOLIN -> listOf("/v1/orgs", "/v1/openapi.json", "/v1/")
+                    ServiceType.PANGOLIN -> {
+                        val orgId = instance.username?.trim().orEmpty()
+                        if (orgId.isNotEmpty()) {
+                            listOf("/v1/org/$orgId/sites?pageSize=1&page=1", "/v1/orgs", "/v1/openapi.json", "")
+                        } else {
+                            listOf("/v1/orgs", "/v1/openapi.json", "/v1/", "")
+                        }
+                    }
                     ServiceType.WAKAPI -> listOf("/api/health", "/api/summary", "")
                     ServiceType.PROXMOX -> listOf("/api2/json/version", "")
                     ServiceType.TRUENAS -> listOf("/api/current", "/ui", "")
