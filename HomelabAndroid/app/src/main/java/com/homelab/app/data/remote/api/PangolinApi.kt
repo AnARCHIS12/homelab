@@ -27,7 +27,7 @@ import retrofit2.http.Query
 
 interface PangolinApi {
 
-    @GET("api/v1/orgs")
+    @GET("v1/orgs")
     suspend fun listOrgs(
         @Header("X-Homelab-Service") service: String = "Pangolin",
         @Header("X-Homelab-Instance-Id") instanceId: String,
@@ -35,7 +35,7 @@ interface PangolinApi {
         @Query("offset") offset: Int = 0
     ): PangolinOrgsResponse
 
-    @GET("api/v1/org/{orgId}/sites")
+    @GET("v1/org/{orgId}/sites")
     suspend fun listSites(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -44,7 +44,7 @@ interface PangolinApi {
         @Query("page") page: Int = 1
     ): PangolinSitesResponse
 
-    @GET("api/v1/org/{orgId}/site-resources")
+    @GET("v1/org/{orgId}/site-resources")
     suspend fun listSiteResources(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -53,7 +53,7 @@ interface PangolinApi {
         @Query("page") page: Int = 1
     ): PangolinSiteResourcesResponse
 
-    @GET("api/v1/org/{orgId}/resources")
+    @GET("v1/org/{orgId}/resources")
     suspend fun listResources(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -62,7 +62,7 @@ interface PangolinApi {
         @Query("page") page: Int = 1
     ): PangolinResourcesResponse
 
-    @GET("api/v1/org/{orgId}/clients")
+    @GET("v1/org/{orgId}/clients")
     suspend fun listClients(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -72,7 +72,7 @@ interface PangolinApi {
         @Query("status") status: String = "active,blocked,archived"
     ): PangolinClientsResponse
 
-    @GET("api/v1/org/{orgId}/user-devices")
+    @GET("v1/org/{orgId}/user-devices")
     suspend fun listUserDevices(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -82,7 +82,7 @@ interface PangolinApi {
         @Query("status") status: String = "active,pending,denied,blocked,archived"
     ): PangolinUserDevicesResponse
 
-    @GET("api/v1/org/{orgId}/domains")
+    @GET("v1/org/{orgId}/domains")
     suspend fun listDomains(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -91,7 +91,7 @@ interface PangolinApi {
         @Query("offset") offset: Int = 0
     ): PangolinDomainsResponse
 
-    @GET("api/v1/resource/{resourceId}/targets")
+    @GET("v1/resource/{resourceId}/targets")
     suspend fun listTargets(
         @Path("resourceId") resourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -100,28 +100,28 @@ interface PangolinApi {
         @Query("offset") offset: Int = 0
     ): PangolinTargetsResponse
 
-    @GET("api/v1/site-resource/{siteResourceId}/users")
+    @GET("v1/site-resource/{siteResourceId}/users")
     suspend fun listSiteResourceUsers(
         @Path("siteResourceId") siteResourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
         @Header("X-Homelab-Instance-Id") instanceId: String
     ): PangolinSiteResourceUsersResponse
 
-    @GET("api/v1/site-resource/{siteResourceId}/roles")
+    @GET("v1/site-resource/{siteResourceId}/roles")
     suspend fun listSiteResourceRoles(
         @Path("siteResourceId") siteResourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
         @Header("X-Homelab-Instance-Id") instanceId: String
     ): PangolinSiteResourceRolesResponse
 
-    @GET("api/v1/site-resource/{siteResourceId}/clients")
+    @GET("v1/site-resource/{siteResourceId}/clients")
     suspend fun listSiteResourceClients(
         @Path("siteResourceId") siteResourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
         @Header("X-Homelab-Instance-Id") instanceId: String
     ): PangolinSiteResourceClientsResponse
 
-    @POST("api/v1/org/{orgId}/site-resources")
+    @POST("v1/org/{orgId}/site-resources")
     suspend fun createSiteResource(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -129,7 +129,7 @@ interface PangolinApi {
         @Body body: JsonObject
     ): PangolinEnvelope<PangolinSiteResource>
 
-    @POST("api/v1/resource/{resourceId}")
+    @POST("v1/resource/{resourceId}")
     suspend fun updateResource(
         @Path("resourceId") resourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -137,7 +137,7 @@ interface PangolinApi {
         @Body body: JsonObject
     ): PangolinEnvelope<PangolinResource>
 
-    @PUT("api/v1/org/{orgId}/resource")
+    @PUT("v1/org/{orgId}/resource")
     suspend fun createResource(
         @Path("orgId") orgId: String,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -145,7 +145,7 @@ interface PangolinApi {
         @Body body: JsonObject
     ): PangolinEnvelope<PangolinResource>
 
-    @POST("api/v1/target/{targetId}")
+    @POST("v1/target/{targetId}")
     suspend fun updateTarget(
         @Path("targetId") targetId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -153,7 +153,7 @@ interface PangolinApi {
         @Body body: JsonObject
     ): PangolinEnvelope<PangolinTarget>
 
-    @PUT("api/v1/resource/{resourceId}/target")
+    @PUT("v1/resource/{resourceId}/target")
     suspend fun createTarget(
         @Path("resourceId") resourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -161,7 +161,7 @@ interface PangolinApi {
         @Body body: JsonObject
     ): PangolinEnvelope<PangolinTarget>
 
-    @POST("api/v1/site-resource/{siteResourceId}")
+    @POST("v1/site-resource/{siteResourceId}")
     suspend fun updateSiteResource(
         @Path("siteResourceId") siteResourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",
@@ -169,7 +169,7 @@ interface PangolinApi {
         @Body body: JsonObject
     ): PangolinEnvelope<PangolinSiteResource>
 
-    @DELETE("api/v1/resource/{resourceId}")
+    @DELETE("v1/resource/{resourceId}")
     suspend fun deleteResource(
         @Path("resourceId") resourceId: Int,
         @Header("X-Homelab-Service") service: String = "Pangolin",

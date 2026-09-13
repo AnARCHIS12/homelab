@@ -66,11 +66,13 @@ class PangolinRepository @Inject constructor(
             val rawBase = cleanUrl(url)
             val candidatePaths = if (cleanedOrgId.isNotEmpty()) {
                 listOf(
+                    "v1/org/$cleanedOrgId/sites?pageSize=1&page=1",
                     "api/v1/org/$cleanedOrgId/sites?pageSize=1&page=1",
+                    "v1/orgs",
                     "api/v1/orgs"
                 )
             } else {
-                listOf("api/v1/orgs")
+                listOf("v1/orgs", "api/v1/orgs")
             }
 
             var lastError: Exception? = null
