@@ -1,5 +1,5 @@
 {
-  "latest": "1.6.3",
-  "android_url": "https://github.com/AnARCHIS12/homelab/releases/download/v1.6.3/Homelab.apk",
-  "changelog": "Version 1.6.3:\n- Replaced nationalist flags in language selection with clean ISO language identifiers.\n- Updated icon variants to red neon gradient style.\n- Simplified contact options to personal GitHub.\n- Version bump to 1.6.3."
+  "latest": "1.6.4",
+  "android_url": "https://github.com/AnARCHIS12/homelab/releases/download/v1.6.4/Homelab.apk",
+  "changelog": "Version 1.6.4:\n- Résolution du parsing JSON Pangolin (booléens entiers et ressources de site optionnelles).\n- Harmonisation visuelle de l'onboarding et du code PIN avec le thème Homelab Red."
 }
