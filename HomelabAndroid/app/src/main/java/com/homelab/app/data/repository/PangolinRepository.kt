@@ -2,6 +2,8 @@ package com.homelab.app.data.repository
 
 import com.homelab.app.data.remote.api.PangolinApi
 import com.homelab.app.data.remote.TlsClientSelector
+import com.homelab.app.data.security.ServiceUrlNormalizer
+import com.homelab.app.util.ServiceType
 import com.homelab.app.data.remote.dto.pangolin.PangolinClient
 import com.homelab.app.data.remote.dto.pangolin.PangolinDomain
 import com.homelab.app.data.remote.dto.pangolin.PangolinOrg
@@ -61,14 +63,14 @@ class PangolinRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             val token = cleanToken(apiKey)
             val cleanedOrgId = orgId?.trim().orEmpty()
-            val rawBase = cleanUrl(url).removeSuffix("/api/v1").removeSuffix("/api").removeSuffix("/")
+            val rawBase = cleanUrl(url)
             val candidatePaths = if (cleanedOrgId.isNotEmpty()) {
                 listOf(
                     "api/v1/org/$cleanedOrgId/sites?pageSize=1&page=1",
-                    "v1/org/$cleanedOrgId/sites?pageSize=1&page=1"
+                    "api/v1/orgs"
                 )
             } else {
-                listOf("api/v1/orgs", "v1/orgs")
+                listOf("api/v1/orgs")
             }
 
             var lastError: Exception? = null
@@ -82,22 +84,27 @@ class PangolinRepository @Inject constructor(
                 try {
                     val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
                     response.use { resp ->
+                        if (resp.code in 401..403) {
+                            throw IllegalStateException("Clé d'API Pangolin invalide ou non autorisée (HTTP ${resp.code}).")
+                        }
                         val contentType = resp.header("Content-Type")?.lowercase().orEmpty()
                         val isHtml = contentType.contains("text/html") || contentType.contains("application/xhtml+xml")
                         if (isHtml) {
                             throw IllegalStateException("Le serveur a renvoyé une page HTML au lieu de JSON. Vérifiez l'adresse de votre instance Pangolin.")
                         }
-                        if (resp.code in 401..403) {
-                            throw IllegalStateException("Clé d'API Pangolin invalide ou non autorisée (HTTP ${resp.code}).")
-                        }
                         if (resp.isSuccessful) {
                             return@withContext
+                        } else if (resp.code == 404) {
+                            throw IllegalStateException("Organisation Pangolin introuvable ou URL incorrecte (HTTP 404).")
                         } else {
                             throw IllegalStateException("Pangolin a retourné une erreur HTTP ${resp.code}.")
                         }
                     }
                 } catch (e: Exception) {
                     lastError = e
+                    if (e.message?.contains("invalide ou non autorisée") == true) {
+                        throw e
+                    }
                 }
             }
             throw lastError ?: IllegalStateException("Pangolin authentication failed")
@@ -509,7 +516,7 @@ class PangolinRepository @Inject constructor(
         api.deleteResource(resourceId = resourceId, instanceId = instanceId)
     }
 
-    private fun cleanUrl(url: String): String = url.trim().removeSuffix("/")
+    private fun cleanUrl(url: String): String = ServiceUrlNormalizer.normalizeUrl(url, ServiceType.PANGOLIN, allowHttp = true)
 
     private fun cleanToken(apiKey: String): String {
         val raw = apiKey.trim()

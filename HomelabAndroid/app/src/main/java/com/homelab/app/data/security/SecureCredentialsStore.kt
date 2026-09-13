@@ -141,10 +141,9 @@ class KeystoreSecureCredentialsStore @Inject constructor(
             val plaintext = jsonString.toByteArray(Charsets.UTF_8)
 
             val secretKey = getOrCreateSecretKey()
-            val iv = ByteArray(IV_LENGTH).also { SecureRandom().nextBytes(it) }
-
             val cipher = Cipher.getInstance(AES_GCM)
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv))
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+            val iv = cipher.iv
             val ciphertext = cipher.doFinal(plaintext)
 
             val output = ByteArray(HEADER_SIZE + ciphertext.size)

@@ -152,6 +152,12 @@ object ServiceUrlNormalizer {
             }
         }
 
+        // Special case for Pangolin: Pangolin web UI routes look like /<orgId>, /<orgId>/settings/sites, etc.
+        // The API is always mounted on the server origin under /api/v1. Base URL must always be root.
+        if (type == ServiceType.PANGOLIN) {
+            return ""
+        }
+
         // Special case for Plex paths with sub-routes under /web (e.g. /web/index.html#!/...)
         if (type == ServiceType.PLEX && path.contains("/web")) {
             val idx = path.indexOf("/web")

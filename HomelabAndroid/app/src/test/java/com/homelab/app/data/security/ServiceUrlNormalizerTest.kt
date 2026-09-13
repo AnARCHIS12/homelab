@@ -33,6 +33,8 @@ class ServiceUrlNormalizerTest {
         assertEquals("https://pangolin.lan", ServiceUrlNormalizer.normalizeUrl("https://pangolin.lan/api/v1", ServiceType.PANGOLIN))
         assertEquals("https://pangolin.lan", ServiceUrlNormalizer.normalizeUrl("https://pangolin.lan/api", ServiceType.PANGOLIN))
         assertEquals("https://pangolin.lan", ServiceUrlNormalizer.normalizeUrl("https://pangolin.lan/v1", ServiceType.PANGOLIN))
+        assertEquals("https://pangolin.lan", ServiceUrlNormalizer.normalizeUrl("https://pangolin.lan/as", ServiceType.PANGOLIN))
+        assertEquals("https://pangolin.lan", ServiceUrlNormalizer.normalizeUrl("https://pangolin.lan/as/settings/sites", ServiceType.PANGOLIN))
     }
 
     @Test
