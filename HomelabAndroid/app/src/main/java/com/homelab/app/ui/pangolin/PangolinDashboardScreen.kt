@@ -1205,7 +1205,7 @@ private fun PangolinPrivateResourceEditorSheet(
 
     var saving by remember(resource.siteResourceId) { mutableStateOf(false) }
     var name by remember(resource.siteResourceId) { mutableStateOf(resource.name) }
-    var selectedSiteId by remember(resource.siteResourceId) { mutableStateOf(resource.siteId) }
+    var selectedSiteId by remember(resource.siteResourceId) { mutableStateOf(resource.siteId ?: sites.firstOrNull()?.siteId ?: 0) }
     var mode by remember(resource.siteResourceId) { mutableStateOf(resource.mode ?: "host") }
     var destination by remember(resource.siteResourceId) { mutableStateOf(resource.destination.orEmpty()) }
     var enabled by remember(resource.siteResourceId) { mutableStateOf(resource.enabled) }

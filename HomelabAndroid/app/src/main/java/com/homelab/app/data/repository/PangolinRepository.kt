@@ -359,7 +359,7 @@ class PangolinRepository @Inject constructor(
         }
         return collected.sortedWith(
             compareByDescending<PangolinSiteResource> { it.enabled }
-                .thenBy { it.siteName.lowercase() }
+                .thenBy { it.siteName.orEmpty().lowercase() }
                 .thenBy { it.name.lowercase() }
         )
     }

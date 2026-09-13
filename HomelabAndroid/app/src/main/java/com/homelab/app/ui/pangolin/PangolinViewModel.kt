@@ -333,7 +333,7 @@ class PangolinViewModel @Inject constructor(
             siteResourceId = resource.siteResourceId,
             bindings = bindings,
             name = resource.name.trim(),
-            siteId = resource.siteId,
+            siteId = resource.siteId ?: 0,
             mode = resource.mode ?: "host",
             destination = resource.destination.orEmpty().trim(),
             enabled = newEnabled,
