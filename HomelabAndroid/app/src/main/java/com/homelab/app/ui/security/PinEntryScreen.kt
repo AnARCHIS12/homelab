@@ -56,41 +56,41 @@ internal fun rememberSecurityScreenPalette(): SecurityScreenPalette {
         SecurityScreenPalette(
             backgroundBrush = Brush.verticalGradient(
                 listOf(
-                    Color(0xFF040814),
-                    Color(0xFF0B1120),
-                    Color(0xFF18253E)
+                    Color(0xFF0F0E0E),
+                    Color(0xFF161212),
+                    Color(0xFF221616)
                 )
             ),
-            accent = Color(0xFF12D6B3),
-            primaryText = Color.White,
-            secondaryText = Color.White.copy(alpha = 0.64f),
-            iconFill = Color.White.copy(alpha = 0.08f),
-            iconStroke = Color.White.copy(alpha = 0.12f),
-            dotEmpty = Color.White.copy(alpha = 0.12f),
-            keypadFill = Color.White.copy(alpha = 0.075f),
-            keypadAltFill = Color.White.copy(alpha = 0.06f),
-            keypadStroke = Color(0xFF35507B).copy(alpha = 0.72f),
-            keypadText = Color(0xFF12D6B3)
+            accent = scheme.primary,
+            primaryText = scheme.onBackground,
+            secondaryText = scheme.onSurfaceVariant,
+            iconFill = scheme.primary.copy(alpha = 0.12f),
+            iconStroke = scheme.primary.copy(alpha = 0.28f),
+            dotEmpty = scheme.outlineVariant.copy(alpha = 0.6f),
+            keypadFill = scheme.surfaceContainerHigh.copy(alpha = 0.7f),
+            keypadAltFill = scheme.surfaceContainerLow.copy(alpha = 0.7f),
+            keypadStroke = scheme.outlineVariant.copy(alpha = 0.5f),
+            keypadText = scheme.onSurface
         )
     } else {
         SecurityScreenPalette(
             backgroundBrush = Brush.verticalGradient(
                 listOf(
-                    Color(0xFFF3FAFF),
-                    Color(0xFFEAF4FF),
-                    Color(0xFFDCEEFE)
+                    Color(0xFFFFF8F7),
+                    Color(0xFFFDF2F1),
+                    Color(0xFFF8EAE9)
                 )
             ),
-            accent = Color(0xFF0F9F8C),
-            primaryText = Color(0xFF0F172A),
-            secondaryText = Color(0xFF475569),
-            iconFill = Color.White.copy(alpha = 0.74f),
-            iconStroke = Color(0xFFB7CFDF).copy(alpha = 0.9f),
-            dotEmpty = Color(0xFFB9CBD9),
-            keypadFill = Color.White.copy(alpha = 0.92f),
-            keypadAltFill = Color.White.copy(alpha = 0.84f),
-            keypadStroke = Color(0xFFB7CFDF),
-            keypadText = Color(0xFF0F9F8C)
+            accent = scheme.primary,
+            primaryText = scheme.onBackground,
+            secondaryText = scheme.onSurfaceVariant,
+            iconFill = scheme.primary.copy(alpha = 0.08f),
+            iconStroke = scheme.primary.copy(alpha = 0.22f),
+            dotEmpty = scheme.outlineVariant,
+            keypadFill = scheme.surfaceContainerLowest,
+            keypadAltFill = scheme.surfaceContainer,
+            keypadStroke = scheme.outlineVariant,
+            keypadText = scheme.onSurface
         )
     }
 }
@@ -158,7 +158,7 @@ fun PinEntryScreen(
                         imageVector = Icons.Default.Lock,
                         contentDescription = title,
                         modifier = Modifier.size(40.dp),
-                        tint = palette.primaryText
+                        tint = palette.accent
                     )
                 }
             }
@@ -269,7 +269,7 @@ fun PinEntryScreen(
                             Icon(
                                 imageVector = Icons.Default.Fingerprint,
                                 contentDescription = stringResource(R.string.security_enable_biometric),
-                                tint = palette.keypadText,
+                                tint = palette.accent,
                                 modifier = Modifier.size(28.dp)
                             )
                         }

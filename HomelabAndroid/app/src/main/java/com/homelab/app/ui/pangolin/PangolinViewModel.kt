@@ -160,7 +160,11 @@ class PangolinViewModel @Inject constructor(
             try {
                 val currentInstance = servicesRepository.instancesByType.first()[ServiceType.PANGOLIN]
                     ?.firstOrNull { it.id == instanceId }
-                val scopedOrgId = currentInstance?.username?.takeIf { it.isNotBlank() }
+                val scopedOrgId = when {
+                    !currentInstance?.apiKey.isNullOrBlank() -> currentInstance?.username?.takeIf { it.isNotBlank() }
+                    currentInstance?.username?.contains("@") == true -> null
+                    else -> currentInstance?.username?.takeIf { it.isNotBlank() }
+                }
                 val orgs = repository.listOrgs(instanceId, scopedOrgId)
                 val resolvedOrgId = forceOrgId?.takeIf { candidate -> orgs.any { it.orgId == candidate } }
                     ?: orgs.firstOrNull()?.orgId

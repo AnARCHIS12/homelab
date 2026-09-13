@@ -1358,7 +1358,12 @@
     <string name="linux_update_detail_no_hidden_updates">Aucune mise à jour masquée.</string>
     <string name="linux_update_detail_no_history">Aucune activité récente.</string>
     <string name="service_pangolin">Pangolin</string>
-    <string name="login_hint_pangolin">Utilisez une clé Integration API Pangolin. Pour une clé limitée à une organisation (Org-Scoped Key), indiquez aussi l\’ID d\’organisation.</string>
+    <string name="login_hint_pangolin">Connectez-vous avec vos identifiants Pangolin (e-mail et mot de passe), ou passez en mode Clé d\'API.</string>
+    <string name="login_pangolin_auth_mode">Utiliser une clé d\'API</string>
+    <string name="login_pangolin_credentials_hint">Utiliser l\'e-mail et le mot de passe (par défaut, port 443).</string>
+    <string name="login_pangolin_api_key_hint">Utiliser la clé d\'API d\'intégration Pangolin (port 3003).</string>
+    <string name="login_pangolin_2fa_optional">Code 2FA / MFA (optionnel)</string>
+    <string name="login_pangolin_api_port_note">Le mode Clé d\'API se connecte à l\'API d\'intégration Pangolin (généralement sur le port 3003), qui doit être activée dans le fichier config.yml de votre serveur. Pour un accès standard via HTTPS (port 443), utilisez le mode E-mail et mot de passe.</string>
     <string name="pangolin_org_id_hint">ID d\’organisation (optionnel)</string>
     <string name="pangolin_sites_clients">sites / clients</string>
     <string name="pangolin_overview_subtitle">Vue d’ensemble du reverse proxy, du tunneling et du réseau zero-trust</string>

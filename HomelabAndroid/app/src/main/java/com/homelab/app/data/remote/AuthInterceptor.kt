@@ -4,6 +4,7 @@ import com.homelab.app.data.repository.BeszelRepository
 import com.homelab.app.data.repository.DockhandRepository
 import com.homelab.app.data.repository.MaltrailRepository
 import com.homelab.app.data.repository.NginxProxyManagerRepository
+import com.homelab.app.data.repository.PangolinRepository
 import com.homelab.app.data.repository.ProxmoxRepository
 import com.homelab.app.data.repository.ServiceInstancesRepository
 import com.homelab.app.util.GlobalEventBus
@@ -23,7 +24,8 @@ class AuthInterceptor @Inject constructor(
     private val dockhandRepository: dagger.Lazy<DockhandRepository>,
     private val maltrailRepository: dagger.Lazy<MaltrailRepository>,
     private val nginxProxyManagerRepository: dagger.Lazy<NginxProxyManagerRepository>,
-    private val proxmoxRepository: dagger.Lazy<ProxmoxRepository>
+    private val proxmoxRepository: dagger.Lazy<ProxmoxRepository>,
+    private val pangolinRepository: dagger.Lazy<PangolinRepository>
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
@@ -72,6 +74,21 @@ class AuthInterceptor @Inject constructor(
         }
 
         if (effectiveInstance != null) {
+            if (effectiveInstance.type == ServiceType.PANGOLIN) {
+                if (effectiveInstance.token.isNotBlank()) {
+                    val currentPath = request.url.encodedPath
+                    if (currentPath.contains("/v1/") && !currentPath.contains("/api/v1/")) {
+                        val newPath = currentPath.replaceFirst("/v1/", "/api/v1/")
+                        requestBuilder.url(request.url.newBuilder().encodedPath(newPath).build())
+                    }
+                } else if (!effectiveInstance.apiKey.isNullOrBlank()) {
+                    val currentPath = request.url.encodedPath
+                    if (currentPath.contains("/api/v1/")) {
+                        val newPath = currentPath.replaceFirst("/api/v1/", "/v1/")
+                        requestBuilder.url(request.url.newBuilder().encodedPath(newPath).build())
+                    }
+                }
+            }
             val hasAuthorization = request.header("Authorization") != null
             addAuthHeaders(requestBuilder, effectiveInstance, hasAuthorization)
         }
@@ -285,6 +302,32 @@ class AuthInterceptor @Inject constructor(
             }
         }
 
+        // Auto-retry for Pangolin on session expiration (401 or 403)
+        if (effectiveInstance != null &&
+            effectiveInstance.type == ServiceType.PANGOLIN &&
+            effectiveInstance.token.isNotBlank() &&
+            bypassHeader != "true" &&
+            !effectiveInstance.username.isNullOrBlank() &&
+            !effectiveInstance.password.isNullOrBlank() &&
+            (response.code == 401 || response.code == 403)
+        ) {
+            val newSessionCookie = try {
+                runBlocking {
+                    pangolinRepository.get().refreshStoredSession(effectiveInstance.id)
+                }
+            } catch (_: Exception) { null }
+
+            if (newSessionCookie != null) {
+                response.close()
+                val retryBuilder = request.newBuilder()
+                    .removeHeader("Cookie")
+                    .removeHeader("x-csrf-token")
+                    .addHeader("Cookie", newSessionCookie)
+                    .addHeader("x-csrf-token", "x-csrf-protection")
+                return chain.proceed(retryBuilder.build())
+            }
+        }
+
         if (response.code == 401 &&
             bypassHeader != "true" &&
             effectiveInstance != null &&
@@ -396,7 +439,10 @@ class AuthInterceptor @Inject constructor(
                 }
             }
             ServiceType.PANGOLIN -> {
-                if (!hasAuthorization && !instance.apiKey.isNullOrBlank()) {
+                if (instance.token.isNotBlank()) {
+                    builder.addHeader("Cookie", instance.token)
+                    builder.addHeader("x-csrf-token", "x-csrf-protection")
+                } else if (!hasAuthorization && !instance.apiKey.isNullOrBlank()) {
                     val token = instance.apiKey.trim().let { raw ->
                         if (raw.startsWith("bearer ", ignoreCase = true)) raw.substring(7).trim() else raw
                     }

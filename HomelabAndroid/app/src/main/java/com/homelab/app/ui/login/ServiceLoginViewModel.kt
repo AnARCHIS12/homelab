@@ -115,7 +115,8 @@ class ServiceLoginViewModel @Inject constructor(
         customCertFingerprint: String = "",
         proxmoxRealm: String = "pam",
         proxmoxOtp: String = "",
-        proxmoxUseApiToken: Boolean = false
+        proxmoxUseApiToken: Boolean = false,
+        pangolinUseApiKey: Boolean = false
     ) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -296,18 +297,60 @@ class ServiceLoginViewModel @Inject constructor(
                             )
                         }
                         ServiceType.PANGOLIN -> {
-                            require(trimmedApiKey.isNotBlank()) { context.getString(R.string.login_error_api_key_required) }
-                            val orgId = trimmedUsername.ifBlank { null }
-                            pangolinRepository.authenticate(cleanUrl, trimmedApiKey, orgId, allowSelfSigned = allowSelfSigned)
-                            ServiceInstance(
-                                id = instanceId,
-                                type = serviceType,
-                                label = normalizedLabel,
-                                url = cleanUrl,
-                                username = orgId,
-                                apiKey = trimmedApiKey,
-                                fallbackUrl = cleanFallbackUrl
-                            )
+                            if (pangolinUseApiKey) {
+                                require(trimmedApiKey.isNotBlank()) { context.getString(R.string.login_error_api_key_required) }
+                                val orgId = trimmedUsername.ifBlank { null }
+                                if (existing == null || existing.url != cleanUrl || existing.apiKey != trimmedApiKey || existing.username != orgId) {
+                                    pangolinRepository.authenticate(cleanUrl, trimmedApiKey, orgId, allowSelfSigned = allowSelfSigned)
+                                }
+                                ServiceInstance(
+                                    id = instanceId,
+                                    type = serviceType,
+                                    label = normalizedLabel,
+                                    url = cleanUrl,
+                                    username = orgId,
+                                    apiKey = trimmedApiKey,
+                                    fallbackUrl = cleanFallbackUrl
+                                )
+                            } else {
+                                require(trimmedUsername.isNotBlank()) { context.getString(R.string.login_error_email_required) }
+                                val authPassword = trimmedPassword.ifBlank {
+                                    if (existing != null && existing.url == cleanUrl && existing.username == trimmedUsername) {
+                                        return@ifBlank existing.password.orEmpty()
+                                    }
+                                    throw IllegalArgumentException(context.getString(R.string.login_error_password_required))
+                                }
+                                require(authPassword.isNotBlank()) { context.getString(R.string.login_error_password_required) }
+
+                                val sessionCookie = if (
+                                    existing != null &&
+                                    existing.url == cleanUrl &&
+                                    existing.username == trimmedUsername &&
+                                    trimmedPassword.isBlank() &&
+                                    existing.token.isNotBlank()
+                                ) {
+                                    existing.token
+                                } else {
+                                    pangolinRepository.authenticateWithCredentials(
+                                        url = cleanUrl,
+                                        email = trimmedUsername,
+                                        password = authPassword,
+                                        code = trimmedMfaCode.ifBlank { null },
+                                        allowSelfSigned = allowSelfSigned
+                                    )
+                                }
+
+                                ServiceInstance(
+                                    id = instanceId,
+                                    type = serviceType,
+                                    label = normalizedLabel,
+                                    url = cleanUrl,
+                                    token = sessionCookie,
+                                    username = trimmedUsername,
+                                    password = authPassword,
+                                    fallbackUrl = cleanFallbackUrl
+                                )
+                            }
                         }
                         ServiceType.LINUX_UPDATE -> {
                             require(trimmedApiKey.isNotBlank()) { context.getString(R.string.login_error_api_key_required) }

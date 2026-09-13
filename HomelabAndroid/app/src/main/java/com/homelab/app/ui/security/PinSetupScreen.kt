@@ -51,12 +51,17 @@ fun PinSetupScreen(
     val mismatchText = stringResource(R.string.security_pin_mismatch)
     val palette = rememberSecurityScreenPalette()
 
-    Scaffold { padding ->
+    Scaffold(
+        containerColor = Color.Transparent,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(palette.backgroundBrush)
+    ) { padding ->
         AnimatedContent(
             targetState = step,
             modifier = Modifier
-                .padding(padding)
-                .background(palette.backgroundBrush),
+                .fillMaxSize()
+                .padding(padding),
             transitionSpec = {
                 slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
             },
@@ -134,7 +139,6 @@ private fun WelcomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(palette.backgroundBrush)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -208,7 +212,6 @@ private fun AskSetupScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(palette.backgroundBrush)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

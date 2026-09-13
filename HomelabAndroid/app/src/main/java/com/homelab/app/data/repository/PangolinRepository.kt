@@ -24,7 +24,9 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,10 +50,160 @@ data class PangolinSiteResourceBindings(
 @Singleton
 class PangolinRepository @Inject constructor(
     private val api: PangolinApi,
-    private val tlsClientSelector: TlsClientSelector
+    private val tlsClientSelector: TlsClientSelector,
+    private val serviceInstancesRepository: dagger.Lazy<ServiceInstancesRepository>
 ) {
     private companion object {
         const val DASHBOARD_RESOURCE_LIMIT = 8
+    }
+
+    suspend fun loginWithCredentials(
+        url: String,
+        email: String,
+        password: String,
+        code: String? = null,
+        allowSelfSigned: Boolean = false
+    ): String {
+        return withContext(Dispatchers.IO) {
+            val rawBase = cleanUrl(url)
+            val payload = buildJsonObject {
+                put("email", email.trim())
+                put("password", password)
+                if (!code.isNullOrBlank()) {
+                    put("code", code.trim())
+                }
+            }.toString()
+
+            val requestBody = payload.toRequestBody("application/json".toMediaType())
+            val request = Request.Builder()
+                .url("$rawBase/api/v1/auth/login")
+                .post(requestBody)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .addHeader("x-csrf-token", "x-csrf-protection")
+                .build()
+
+            val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
+            response.use { resp ->
+                val responseBody = try {
+                    resp.peekBody(4096).string()
+                } catch (_: Exception) { "" }
+
+                if (resp.code in 401..403) {
+                    val lowered = responseBody.lowercase()
+                    if (lowered.contains("totp") || lowered.contains("2fa") || lowered.contains("code")) {
+                        throw IllegalStateException("Code 2FA/MFA Pangolin requis ou invalide.")
+                    }
+                    throw IllegalStateException("Identifiants Pangolin incorrects (email ou mot de passe invalide).")
+                }
+
+                val contentType = resp.header("Content-Type")?.lowercase().orEmpty()
+                val isHtml = contentType.contains("text/html") || contentType.contains("application/xhtml+xml")
+                if (isHtml) {
+                    throw IllegalStateException("Le serveur a renvoyé une page HTML au lieu de JSON. Vérifiez l'adresse de votre instance Pangolin.")
+                }
+
+                if (!resp.isSuccessful) {
+                    throw IllegalStateException("Échec de connexion à Pangolin (HTTP ${resp.code}).")
+                }
+
+                val setCookieHeaders = resp.headers("Set-Cookie")
+                if (setCookieHeaders.isEmpty()) {
+                    throw IllegalStateException("Pangolin n'a pas retourné de cookie de session.")
+                }
+
+                val cookies = setCookieHeaders.map { it.substringBefore(";").trim() }
+                    .filter { it.isNotBlank() }
+                cookies.joinToString("; ")
+            }
+        }
+    }
+
+    suspend fun authenticateWithCredentials(
+        url: String,
+        email: String,
+        password: String,
+        code: String? = null,
+        orgId: String? = null,
+        allowSelfSigned: Boolean = false
+    ): String {
+        return withContext(Dispatchers.IO) {
+            val sessionCookie = loginWithCredentials(
+                url = url,
+                email = email,
+                password = password,
+                code = code,
+                allowSelfSigned = allowSelfSigned
+            )
+            val cleanedOrgId = orgId?.trim().orEmpty()
+            val rawBase = cleanUrl(url)
+            val candidatePaths = if (cleanedOrgId.isNotEmpty()) {
+                listOf(
+                    "api/v1/org/$cleanedOrgId/sites?pageSize=1&page=1",
+                    "api/v1/orgs"
+                )
+            } else {
+                listOf("api/v1/orgs")
+            }
+
+            var lastError: Exception? = null
+            for (path in candidatePaths) {
+                val request = Request.Builder()
+                    .url("$rawBase/$path")
+                    .addHeader("Cookie", sessionCookie)
+                    .addHeader("x-csrf-token", "x-csrf-protection")
+                    .addHeader("Accept", "application/json")
+                    .build()
+
+                try {
+                    val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
+                    response.use { resp ->
+                        if (resp.code in 401..403) {
+                            throw IllegalStateException("Session Pangolin invalide ou non autorisée (HTTP ${resp.code}).")
+                        }
+                        val contentType = resp.header("Content-Type")?.lowercase().orEmpty()
+                        val isHtml = contentType.contains("text/html") || contentType.contains("application/xhtml+xml")
+                        if (isHtml) {
+                            throw IllegalStateException("Le serveur a renvoyé une page HTML au lieu de JSON. Vérifiez l'adresse de votre instance Pangolin.")
+                        }
+                        if (resp.isSuccessful) {
+                            return@withContext sessionCookie
+                        } else if (resp.code == 404) {
+                            throw IllegalStateException("Organisation Pangolin introuvable ou URL incorrecte (HTTP 404).")
+                        } else {
+                            throw IllegalStateException("Pangolin a retourné une erreur HTTP ${resp.code}.")
+                        }
+                    }
+                } catch (e: Exception) {
+                    lastError = e
+                    if (e.message?.contains("invalide ou non autorisée") == true) {
+                        throw e
+                    }
+                }
+            }
+            throw lastError ?: IllegalStateException("Pangolin authentication failed")
+        }
+    }
+
+    suspend fun refreshStoredSession(instanceId: String): String? {
+        return withContext(Dispatchers.IO) {
+            val instance = serviceInstancesRepository.get().getInstance(instanceId) ?: return@withContext null
+            val email = instance.username?.trim().orEmpty()
+            val password = instance.password.orEmpty()
+            if (email.isBlank() || password.isBlank()) return@withContext null
+            try {
+                val sessionCookie = loginWithCredentials(
+                    url = instance.url,
+                    email = email,
+                    password = password,
+                    allowSelfSigned = instance.allowSelfSigned
+                )
+                serviceInstancesRepository.get().saveInstance(instance.copy(token = sessionCookie))
+                sessionCookie
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
 
     suspend fun authenticate(

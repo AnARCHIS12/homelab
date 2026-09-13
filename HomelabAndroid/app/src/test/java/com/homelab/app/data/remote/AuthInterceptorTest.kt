@@ -4,6 +4,7 @@ import com.homelab.app.data.repository.BeszelRepository
 import com.homelab.app.data.repository.DockhandRepository
 import com.homelab.app.data.repository.MaltrailRepository
 import com.homelab.app.data.repository.NginxProxyManagerRepository
+import com.homelab.app.data.repository.PangolinRepository
 import com.homelab.app.data.repository.ProxmoxRepository
 import com.homelab.app.data.repository.ServiceInstancesRepository
 import com.homelab.app.domain.model.ServiceInstance
@@ -30,7 +31,8 @@ class AuthInterceptorTest {
     private fun createInterceptor(
         eventBus: GlobalEventBus = mockk(relaxed = true),
         instancesRepository: ServiceInstancesRepository = mockk(),
-        beszelRepository: BeszelRepository = mockk()
+        beszelRepository: BeszelRepository = mockk(),
+        pangolinRepository: PangolinRepository = mockk()
     ): Triple<AuthInterceptor, GlobalEventBus, ServiceInstancesRepository> {
         val beszelRepo = mockk<dagger.Lazy<BeszelRepository>>()
         every { beszelRepo.get() } returns beszelRepository
@@ -42,7 +44,9 @@ class AuthInterceptorTest {
         every { npmRepo.get() } returns mockk()
         val proxmoxRepo = mockk<dagger.Lazy<ProxmoxRepository>>()
         every { proxmoxRepo.get() } returns mockk()
-        return Triple(AuthInterceptor(eventBus, instancesRepository, beszelRepo, dockhandRepo, maltrailRepo, npmRepo, proxmoxRepo), eventBus, instancesRepository)
+        val pangolinRepo = mockk<dagger.Lazy<PangolinRepository>>()
+        every { pangolinRepo.get() } returns pangolinRepository
+        return Triple(AuthInterceptor(eventBus, instancesRepository, beszelRepo, dockhandRepo, maltrailRepo, npmRepo, proxmoxRepo, pangolinRepo), eventBus, instancesRepository)
     }
 
     @Test
@@ -274,6 +278,71 @@ class AuthInterceptorTest {
         assertEquals("PVEAPIToken=root@pam!codex=secret-token", capturedRequest.captured.header("Authorization"))
         assertNull(capturedRequest.captured.header("Cookie"))
         assertNull(capturedRequest.captured.header("CSRFPreventionToken"))
+    }
+
+    @Test
+    fun `attaches cookie and csrf token and rewrites path for pangolin session auth`() {
+        val eventBus = mockk<GlobalEventBus>(relaxed = true)
+        val instancesRepository = mockk<ServiceInstancesRepository>()
+        val (interceptor) = createInterceptor(eventBus, instancesRepository)
+        val chain = mockk<Interceptor.Chain>()
+        val capturedRequest = slot<Request>()
+        val request = Request.Builder()
+            .url("https://pangolin.local/v1/org/as/sites?pageSize=1")
+            .header("X-Homelab-Service", "Pangolin")
+            .header("X-Homelab-Instance-Id", "instance-pangolin-cookie")
+            .build()
+
+        coEvery { instancesRepository.getInstance("instance-pangolin-cookie") } returns ServiceInstance(
+            id = "instance-pangolin-cookie",
+            type = ServiceType.PANGOLIN,
+            label = "Pangolin",
+            url = "https://pangolin.local",
+            token = "pangolin_session=s%3Axyz123"
+        )
+        every { chain.request() } returns request
+        every { chain.proceed(capture(capturedRequest)) } answers {
+            response(capturedRequest.captured, 200)
+        }
+
+        interceptor.intercept(chain)
+
+        assertEquals("pangolin_session=s%3Axyz123", capturedRequest.captured.header("Cookie"))
+        assertEquals("x-csrf-protection", capturedRequest.captured.header("x-csrf-token"))
+        assertNull(capturedRequest.captured.header("Authorization"))
+        assertEquals("/api/v1/org/as/sites", capturedRequest.captured.url.encodedPath)
+    }
+
+    @Test
+    fun `attaches bearer auth for pangolin api key auth and keeps v1 path`() {
+        val eventBus = mockk<GlobalEventBus>(relaxed = true)
+        val instancesRepository = mockk<ServiceInstancesRepository>()
+        val (interceptor) = createInterceptor(eventBus, instancesRepository)
+        val chain = mockk<Interceptor.Chain>()
+        val capturedRequest = slot<Request>()
+        val request = Request.Builder()
+            .url("https://pangolin.local:3003/v1/orgs")
+            .header("X-Homelab-Service", "Pangolin")
+            .header("X-Homelab-Instance-Id", "instance-pangolin-key")
+            .build()
+
+        coEvery { instancesRepository.getInstance("instance-pangolin-key") } returns ServiceInstance(
+            id = "instance-pangolin-key",
+            type = ServiceType.PANGOLIN,
+            label = "Pangolin API",
+            url = "https://pangolin.local:3003",
+            apiKey = "my-secret-api-key"
+        )
+        every { chain.request() } returns request
+        every { chain.proceed(capture(capturedRequest)) } answers {
+            response(capturedRequest.captured, 200)
+        }
+
+        interceptor.intercept(chain)
+
+        assertEquals("Bearer my-secret-api-key", capturedRequest.captured.header("Authorization"))
+        assertNull(capturedRequest.captured.header("Cookie"))
+        assertEquals("/v1/orgs", capturedRequest.captured.url.encodedPath)
     }
 
     private fun response(request: Request, code: Int): Response {

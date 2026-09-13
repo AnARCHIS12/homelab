@@ -326,7 +326,11 @@ class HomeViewModel @Inject constructor(
                 InstanceSummary("${report.proxy}", "/ ${report.total}", "proxy_hosts")
             }
             ServiceType.PANGOLIN -> {
-                val scopedOrgId = instance.username?.takeIf { it.isNotBlank() }
+                val scopedOrgId = when {
+                    !instance.apiKey.isNullOrBlank() -> instance.username?.takeIf { it.isNotBlank() }
+                    instance.username?.contains("@") == true -> null
+                    else -> instance.username?.takeIf { it.isNotBlank() }
+                }
                 val (sites, resources, clients) = pangolinRepository.getAggregateSummary(instanceId, scopedOrgId)
                 InstanceSummary("$sites", "/ $clients", "pangolin_sites_clients")
             }

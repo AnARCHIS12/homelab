@@ -108,6 +108,7 @@ fun ServiceLoginScreen(
     var proxmoxRealm by remember { mutableStateOf("pam") }
     var proxmoxOtp by remember { mutableStateOf("") }
     var proxmoxUseApiToken by remember { mutableStateOf(false) }
+    var pangolinUseApiKey by remember { mutableStateOf(false) }
     var fallbackUrl by remember { mutableStateOf("") }
     var allowSelfSigned by remember { mutableStateOf(false) }
     var allowHttp by remember { mutableStateOf(false) }
@@ -144,6 +145,10 @@ fun ServiceLoginScreen(
             }
             apiKey = instance.apiKey.orEmpty()
             proxmoxOtp = instance.proxmoxOtp.orEmpty()
+        } else if (serviceType == ServiceType.PANGOLIN) {
+            pangolinUseApiKey = instance.apiKey.orEmpty().isNotBlank()
+            username = instance.username.orEmpty()
+            apiKey = instance.apiKey.orEmpty()
         } else {
             username = instance.username.orEmpty()
             apiKey = instance.apiKey.orEmpty()
@@ -425,7 +430,8 @@ fun ServiceLoginScreen(
                     customCertFingerprint = customCertFingerprint,
                     proxmoxRealm = proxmoxRealm,
                     proxmoxOtp = proxmoxOtp,
-                    proxmoxUseApiToken = proxmoxUseApiToken
+                    proxmoxUseApiToken = proxmoxUseApiToken,
+                    pangolinUseApiKey = pangolinUseApiKey
                 )
             }
 
@@ -596,7 +602,6 @@ fun ServiceLoginScreen(
             if (
                 serviceType == ServiceType.PORTAINER ||
                 serviceType == ServiceType.HEALTHCHECKS ||
-                serviceType == ServiceType.PANGOLIN ||
                 serviceType == ServiceType.LINUX_UPDATE ||
                 serviceType == ServiceType.DOCKMON ||
                 serviceType == ServiceType.KOMODO ||
@@ -630,21 +635,6 @@ fun ServiceLoginScreen(
                         showSecret = showSecret,
                         onToggleSecret = { showSecret = !showSecret },
                         placeholder = if (isEditing) stringResource(R.string.login_keep_secret_placeholder) else null
-                    )
-                }
-
-                if (serviceType == ServiceType.PANGOLIN) {
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
-                        label = { Text(stringResource(R.string.pangolin_org_id_hint)) },
-                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.pangolin_org_id_hint)) },
-                        singleLine = true,
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Done),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 14.dp),
-                        shape = RoundedCornerShape(14.dp)
                     )
                 }
             } else if (urlOnlyLogin) {
@@ -712,6 +702,57 @@ fun ServiceLoginScreen(
                     }
                 }
 
+                if (serviceType == ServiceType.PANGOLIN) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp)
+                    ) {
+                        androidx.compose.foundation.layout.Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                if (pangolinUseApiKey) Icons.Default.Key else Icons.Default.Lock,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.login_pangolin_auth_mode),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                Text(
+                                    text = if (pangolinUseApiKey) {
+                                        stringResource(R.string.login_pangolin_api_key_hint)
+                                    } else {
+                                        stringResource(R.string.login_pangolin_credentials_hint)
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                            Switch(
+                                checked = pangolinUseApiKey,
+                                onCheckedChange = {
+                                    pangolinUseApiKey = it
+                                    if (it) {
+                                        password = ""
+                                        mfaCode = ""
+                                    } else {
+                                        apiKey = ""
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+
                 if (serviceType == ServiceType.PROXMOX && proxmoxUseApiToken) {
                     SecretField(
                         value = apiKey,
@@ -747,9 +788,56 @@ fun ServiceLoginScreen(
                             )
                         }
                     }
+                } else if (serviceType == ServiceType.PANGOLIN && pangolinUseApiKey) {
+                    SecretField(
+                        value = apiKey,
+                        onValueChange = { apiKey = it },
+                        label = stringResource(R.string.login_api_key_label),
+                        showSecret = showSecret,
+                        onToggleSecret = { showSecret = !showSecret }
+                    )
+
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text(stringResource(R.string.pangolin_org_id_hint)) },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.pangolin_org_id_hint)) },
+                        singleLine = true,
+                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Done),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 14.dp),
+                        shape = RoundedCornerShape(14.dp)
+                    )
+
+                    Surface(
+                        color = MaterialTheme.colorScheme.tertiaryContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp)
+                    ) {
+                        androidx.compose.foundation.layout.Row(
+                            modifier = Modifier.padding(14.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Icon(
+                                Icons.Default.Info,
+                                contentDescription = stringResource(R.string.login_pangolin_api_port_note),
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = stringResource(R.string.login_pangolin_api_port_note),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
+                    }
                 } else {
                 if (serviceType != ServiceType.PIHOLE) {
-                    val isEmailField = serviceType == ServiceType.BESZEL || serviceType == ServiceType.NGINX_PROXY_MANAGER
+                    val isEmailField = serviceType == ServiceType.BESZEL || serviceType == ServiceType.NGINX_PROXY_MANAGER || serviceType == ServiceType.PANGOLIN
                     val usernameLabel = when {
                         serviceType == ServiceType.PATCHMON -> stringResource(R.string.patchmon_token_key)
                         serviceType == ServiceType.UPTIME_KUMA -> stringResource(R.string.uptime_kuma_username_optional)
@@ -788,27 +876,20 @@ fun ServiceLoginScreen(
                     placeholder = if (isEditing) stringResource(R.string.login_keep_secret_placeholder) else null
                 )
 
-                if (serviceType == ServiceType.DOCKHAND || serviceType == ServiceType.TECHNITIUM) {
+                if (serviceType == ServiceType.DOCKHAND || serviceType == ServiceType.TECHNITIUM || serviceType == ServiceType.PANGOLIN) {
+                    val mfaLabel = when (serviceType) {
+                        ServiceType.TECHNITIUM -> stringResource(R.string.login_technitium_totp_optional)
+                        ServiceType.PANGOLIN -> stringResource(R.string.login_pangolin_2fa_optional)
+                        else -> stringResource(R.string.login_dockhand_2fa_optional)
+                    }
                     OutlinedTextField(
                         value = mfaCode,
                         onValueChange = { mfaCode = it },
-                        label = {
-                            Text(
-                                if (serviceType == ServiceType.TECHNITIUM) {
-                                    stringResource(R.string.login_technitium_totp_optional)
-                                } else {
-                                    stringResource(R.string.login_dockhand_2fa_optional)
-                                }
-                            )
-                        },
+                        label = { Text(mfaLabel) },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Key,
-                                contentDescription = if (serviceType == ServiceType.TECHNITIUM) {
-                                    stringResource(R.string.login_technitium_totp_optional)
-                                } else {
-                                    stringResource(R.string.login_dockhand_2fa_optional)
-                                }
+                                contentDescription = mfaLabel
                             )
                         },
                         singleLine = true,

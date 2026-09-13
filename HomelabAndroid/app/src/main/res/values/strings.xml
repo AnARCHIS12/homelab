@@ -689,7 +689,12 @@
     <string name="login_hint_pihole_multi">Use the password or API token configured in Pi-hole under Settings &gt; API / Web interface.</string>
     <string name="login_hint_adguard">Use your AdGuard Home admin username and password.</string>
     <string name="login_hint_gitea_multi">If 2FA is enabled, use an app token instead of your password.</string>
-    <string name="login_hint_pangolin">Use a Pangolin integration API key. If using an org-scoped key (no root access), also enter your Organization ID.</string>
+    <string name="login_hint_pangolin">Log in with your Pangolin dashboard email &amp; password, or switch to API key mode.</string>
+    <string name="login_pangolin_auth_mode">Use API key</string>
+    <string name="login_pangolin_credentials_hint">Use email and password (default, port 443).</string>
+    <string name="login_pangolin_api_key_hint">Use Pangolin integration API key (port 3003).</string>
+    <string name="login_pangolin_2fa_optional">2FA / MFA code (optional)</string>
+    <string name="login_pangolin_api_port_note">API key mode connects to Pangolin\'s Integration API (typically port 3003), which must be enabled in your server config.yml. For standard access via HTTPS (port 443), use Email &amp; Password mode.</string>
     <string name="pangolin_org_id_hint">Organization ID (optional)</string>
     <string name="login_hint_linux_update">Use your linux-update-dashboard API token and instance URL.</string>
     <string name="login_error_api_key_required">API key required.</string>
