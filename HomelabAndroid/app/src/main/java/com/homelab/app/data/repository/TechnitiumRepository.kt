@@ -20,8 +20,32 @@ import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import okhttp3.FormBody
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.Request
+
+internal fun buildTechnitiumLoginRequest(
+    baseUrl: String,
+    username: String,
+    password: String,
+    totp: String
+): Request {
+    val url = ("$baseUrl/api/user/login").toHttpUrlOrNull()
+        ?: throw IllegalStateException("Invalid Technitium URL")
+
+    val form = FormBody.Builder()
+        .add("user", username)
+        .add("pass", password)
+    if (totp.trim().isNotEmpty()) {
+        form.add("totp", totp.trim())
+    }
+    form.add("includeInfo", "true")
+
+    return Request.Builder()
+        .url(url)
+        .post(form.build())
+        .build()
+}
 
 enum class TechnitiumStatsRange(val apiValue: String) {
     LAST_HOUR("LastHour"),
@@ -457,8 +481,7 @@ class TechnitiumRepository @Inject constructor(
     }
 
     private fun authenticateAgainst(baseUrl: String, username: String, password: String, totp: String, allowSelfSigned: Boolean): String {
-        val url = buildLoginUrl(baseUrl, username, password, totp)
-        val request = Request.Builder().url(url).get().build()
+        val request = buildTechnitiumLoginRequest(baseUrl, username, password, totp)
 
         tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
             val body = response.body?.string().orEmpty()
@@ -486,20 +509,6 @@ class TechnitiumRepository @Inject constructor(
                 }
             }
         }
-    }
-
-    private fun buildLoginUrl(baseUrl: String, username: String, password: String, totp: String): String {
-        val builder = ("$baseUrl/api/user/login").toHttpUrlOrNull()?.newBuilder()
-            ?: throw IllegalStateException("Invalid Technitium URL")
-
-        builder.addQueryParameter("user", username)
-        builder.addQueryParameter("pass", password)
-        if (totp.trim().isNotEmpty()) {
-            builder.addQueryParameter("totp", totp.trim())
-        }
-        builder.addQueryParameter("includeInfo", "true")
-
-        return builder.build().toString()
     }
 
     private fun requireSuccess(root: JsonObject): JsonObject {
