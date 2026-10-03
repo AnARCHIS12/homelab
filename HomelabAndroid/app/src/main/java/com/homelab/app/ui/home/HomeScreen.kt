@@ -596,12 +596,12 @@ fun TailscaleCard(isConnected: Boolean) {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, "tailscale://app".toUri()))
                             } catch (_: ActivityNotFoundException) {
                                 try {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, "market://details?id=com.tailscale.ipn".toUri()))
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, "https://f-droid.org/packages/com.tailscale.ipn/".toUri()))
                                 } catch (_: ActivityNotFoundException) {
                                     context.startActivity(
                                         Intent(
                                             Intent.ACTION_VIEW,
-                                            "https://play.google.com/store/apps/details?id=com.tailscale.ipn".toUri()
+                                            "https://f-droid.org/packages/com.tailscale.ipn/".toUri()
                                         )
                                     )
                                 }

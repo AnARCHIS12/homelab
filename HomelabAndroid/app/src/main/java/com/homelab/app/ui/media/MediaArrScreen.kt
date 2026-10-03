@@ -312,7 +312,7 @@ fun MediaArrScreen(
                             .fillMaxWidth()
                             .clickable {
                                 val intent = Intent(Intent.ACTION_VIEW, "tailscale://app".toUri())
-                                val fallback = Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=com.tailscale.ipn".toUri())
+                                val fallback = Intent(Intent.ACTION_VIEW, "https://f-droid.org/packages/com.tailscale.ipn/".toUri())
                                 try {
                                     context.startActivity(intent)
                                 } catch (_: Exception) {
