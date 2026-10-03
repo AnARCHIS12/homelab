@@ -55,7 +55,7 @@ class LinuxUpdateRepository @Inject constructor(
 
             tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
-                    throw IllegalStateException("Linux Update authentication failed")
+                    throw IllegalStateException("Linux Update HTTP ${response.code}")
                 }
             }
         }

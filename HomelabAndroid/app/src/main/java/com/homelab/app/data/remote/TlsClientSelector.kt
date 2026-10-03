@@ -36,10 +36,15 @@ class TlsClientSelector @Inject constructor(
     }
 
     fun forAllowSelfSigned(allowSelfSigned: Boolean, requestUrl: String? = null): OkHttpClient {
-        // The old implementation returned a blind trust-all client here. Keep the
-        // parameter for repository compatibility, but always use normal certificate
-        // validation. The URL is used only to apply the per-connection HTTP policy.
+        // Keep HTTPS connections on the normal client. This is important for public
+        // reverse proxies: the same interceptors, connection settings and request
+        // handling must be used as for every other normal API call.
         val url = requestUrl?.toHttpUrlOrNull() ?: return secureClient
+        if (url.scheme == "https") return secureClient
+
+        // HTTP is allowed only for an explicitly supplied http:// URL. The platform
+        // cleartext policy is enabled globally so this per-request guard remains the
+        // single opt-in boundary; certificate validation is never weakened here.
         val transientInstance = ServiceInstance(
             id = "login-${url.host}-${url.port}",
             type = com.homelab.app.util.ServiceType.UNKNOWN,

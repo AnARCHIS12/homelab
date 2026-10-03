@@ -75,10 +75,12 @@ object ErrorHandler {
                 val msg = error.message.orEmpty()
                 when {
                     msg == "Healthchecks authentication failed" ||
-                    msg == "Linux Update authentication failed" ||
                     msg == "Pangolin authentication failed" ||
-                    msg.startsWith("401:") || msg.startsWith("403:") ->
+                    msg.startsWith("401:") || msg.startsWith("403:") ||
+                    msg == "Linux Update HTTP 401" ->
                         context.getString(R.string.error_invalid_credentials)
+                    msg == "Linux Update HTTP 403" ->
+                        context.getString(R.string.error_forbidden)
                     else -> error.localizedMessage ?: context.getString(R.string.error_unknown)
                 }
             }
