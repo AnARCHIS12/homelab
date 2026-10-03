@@ -73,7 +73,7 @@ jobs:
 
       - name: Build Signed Release APK
         working-directory: HomelabAndroid
-        run: ./gradlew :app:assembleRelease --console=plain
+        run: ./gradlew :app:assembleRelease --console=plain -PenableUpdateCheck=true
 
       - name: Prepare Release Artifacts
         run: |

@@ -17,6 +17,14 @@ android {
         versionCode = 41
         versionName = "1.6.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // F-Droid builds must not contact GitHub or offer an incompatible APK update.
+        // The official release workflow opts in explicitly with -PenableUpdateCheck=true.
+        val enableUpdateCheck = project.findProperty("enableUpdateCheck")
+            ?.toString()
+            ?.toBooleanStrictOrNull()
+            ?: false
+        buildConfigField("boolean", "ENABLE_UPDATE_CHECK", enableUpdateCheck.toString())
         
         vectorDrawables {
             useSupportLibrary = true

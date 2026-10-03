@@ -89,8 +89,10 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init {
-        viewModelScope.launch {
-            checkForUpdateBanner(force = false)
+        if (BuildConfig.ENABLE_UPDATE_CHECK) {
+            viewModelScope.launch {
+                checkForUpdateBanner(force = false)
+            }
         }
     }
 
@@ -194,6 +196,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun checkForUpdateBanner(force: Boolean) {
+        if (!BuildConfig.ENABLE_UPDATE_CHECK) {
+            _updateBannerState.value = null
+            _updatePopupState.value = null
+            return
+        }
+
         val current = BuildConfig.VERSION_NAME
         val dismissed = localPreferencesRepository.dismissedUpdateVersion.firstOrNull()
         val dismissedPopup = localPreferencesRepository.dismissedPopupVersion.firstOrNull()
