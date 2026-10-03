@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.homelab.app.R
 import com.homelab.app.util.ServiceType
 
 @Composable
@@ -108,107 +109,44 @@ val ServiceType.backgroundColor: Color
         ServiceType.UNKNOWN -> if (isThemeDark()) Color(0xFF334155) else Color(0xFFF1F5F9)
     }
 
-val ServiceType.iconUrl: String
+/** Bundled service logos; no network request is needed to render a tile. */
+val ServiceType.localIconRes: Int
     get() = when (this) {
-        ServiceType.PORTAINER -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/portainer.png"
-        ServiceType.PIHOLE -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/pi-hole.png"
-        ServiceType.ADGUARD_HOME -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/adguard-home.png"
-        ServiceType.TECHNITIUM -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/technitium.png"
-        ServiceType.PROXMOX -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/proxmox.png"
-        ServiceType.PLEX -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/plex.png"
-        ServiceType.JELLYSTAT -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/jellystat.png"
-        ServiceType.BESZEL -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/beszel.png"
-        ServiceType.GITEA -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/gitea.png"
-        ServiceType.NGINX_PROXY_MANAGER -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/nginx-proxy-manager.png"
-        ServiceType.PANGOLIN -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/pangolin.png"
-        ServiceType.HEALTHCHECKS -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/healthchecks.png"
-        ServiceType.LINUX_UPDATE -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/linux-update-dashboard.png"
-        ServiceType.DOCKHAND -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/dockhand.png"
-        ServiceType.DOCKMON -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/dockmon.png"
-        ServiceType.KOMODO -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/komodo.png"
-        ServiceType.MALTRAIL -> "https://raw.githubusercontent.com/stamparm/maltrail/master/html/images/mlogo.png"
-        ServiceType.UPTIME_KUMA -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/uptime-kuma.png"
-        ServiceType.UNIFI_NETWORK -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/ubiquiti-unifi.png"
-        ServiceType.CRAFTY_CONTROLLER -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/crafty-controller.png"
-        ServiceType.PATCHMON -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/patchmon.png"
-        ServiceType.RADARR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/radarr.png"
-        ServiceType.SONARR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/sonarr.png"
-        ServiceType.LIDARR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/lidarr.png"
-        ServiceType.QBITTORRENT -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/qbittorrent.png"
-        ServiceType.JELLYSEERR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/jellyseerr.png"
-        ServiceType.PROWLARR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/prowlarr.png"
-        ServiceType.BAZARR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/bazarr.png"
-        ServiceType.GLUETUN -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/gluetun.png"
-        ServiceType.FLARESOLVERR -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/flaresolverr.png"
-        ServiceType.WAKAPI -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/wakapi.png"
-        ServiceType.PTERODACTYL -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/pterodactyl.png"
-        ServiceType.CALAGOPUS -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/calagopus.png"
-        ServiceType.TRUENAS -> "https://cdn.jsdelivr.net/gh/selfhst/icons/png/truenas-scale.png"
-        ServiceType.UNKNOWN -> ""
-    }
-
-val ServiceType.iconCandidates: List<String>
-    get() {
-        val candidates = LinkedHashSet<String>()
-        val primary = iconUrl.trim()
-        if (primary.isNotEmpty()) {
-            candidates += primary
-        }
-
-        if (this == ServiceType.TECHNITIUM) {
-            candidates += "https://cdn.jsdelivr.net/gh/selfhst/icons/png/technitium-dns-server.png"
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/technitium.png"
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/technitium-dns-server.png"
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.DOCKHAND) {
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/dockhand.png"
-            candidates += "https://dockhand.pro/favicon-32x32.png"
-            candidates += "https://dockhand.pro/favicon.ico"
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.DOCKMON) {
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/dockmon.png"
-            candidates += "https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png"
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.KOMODO) {
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/komodo.png"
-            candidates += "https://komo.do/favicon.ico"
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.MALTRAIL) {
-            candidates += "https://raw.githubusercontent.com/stamparm/maltrail/master/html/images/mlogo.png"
-            candidates += "https://raw.githubusercontent.com/stamparm/maltrail/master/html/images/favicon.png"
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.UPTIME_KUMA) {
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/uptime-kuma.png"
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.UNIFI_NETWORK) {
-            return candidates.toList()
-        }
-
-        if (this == ServiceType.TRUENAS) {
-            return candidates.toList()
-        }
-
-        if (primary.isEmpty()) return emptyList()
-
-        val jsDelivrPrefix = "https://cdn.jsdelivr.net/gh/selfhst/icons/png/"
-        if (primary.startsWith(jsDelivrPrefix)) {
-            val slug = primary.removePrefix(jsDelivrPrefix)
-            candidates += "https://raw.githubusercontent.com/selfhst/icons/main/png/$slug"
-        }
-
-        return candidates.toList()
+        ServiceType.PORTAINER -> R.drawable.service_portainer
+        ServiceType.PIHOLE -> R.drawable.service_pihole
+        ServiceType.ADGUARD_HOME -> R.drawable.service_adguard_home
+        ServiceType.TECHNITIUM -> R.drawable.service_technitium
+        ServiceType.PROXMOX -> R.drawable.service_proxmox
+        ServiceType.PLEX -> R.drawable.service_plex
+        ServiceType.JELLYSTAT -> R.drawable.service_jellystat
+        ServiceType.BESZEL -> R.drawable.service_beszel
+        ServiceType.GITEA -> R.drawable.service_gitea
+        ServiceType.NGINX_PROXY_MANAGER -> R.drawable.service_nginx_proxy_manager
+        ServiceType.PANGOLIN -> R.drawable.service_pangolin
+        ServiceType.HEALTHCHECKS -> R.drawable.service_healthchecks
+        ServiceType.LINUX_UPDATE -> R.drawable.service_linux_update
+        ServiceType.DOCKHAND -> R.drawable.service_dockhand
+        ServiceType.DOCKMON -> R.drawable.service_dockmon
+        ServiceType.KOMODO -> R.drawable.service_komodo
+        ServiceType.MALTRAIL -> R.drawable.service_maltrail
+        ServiceType.UPTIME_KUMA -> R.drawable.service_uptime_kuma
+        ServiceType.UNIFI_NETWORK -> R.drawable.service_unifi_network
+        ServiceType.CRAFTY_CONTROLLER -> R.drawable.service_crafty_controller
+        ServiceType.PATCHMON -> R.drawable.service_patchmon
+        ServiceType.RADARR -> R.drawable.service_radarr
+        ServiceType.SONARR -> R.drawable.service_sonarr
+        ServiceType.LIDARR -> R.drawable.service_lidarr
+        ServiceType.QBITTORRENT -> R.drawable.service_qbittorrent
+        ServiceType.JELLYSEERR -> R.drawable.service_jellyseerr
+        ServiceType.PROWLARR -> R.drawable.service_prowlarr
+        ServiceType.BAZARR -> R.drawable.service_bazarr
+        ServiceType.GLUETUN -> R.drawable.service_gluetun
+        ServiceType.FLARESOLVERR -> R.drawable.service_flaresolverr
+        ServiceType.WAKAPI -> R.drawable.service_wakapi
+        ServiceType.PTERODACTYL -> R.drawable.service_pterodactyl
+        ServiceType.CALAGOPUS -> R.drawable.service_calagopus
+        ServiceType.TRUENAS -> R.drawable.service_truenas
+        ServiceType.UNKNOWN -> 0
     }
 
 val ServiceType.fallbackIcon: ImageVector

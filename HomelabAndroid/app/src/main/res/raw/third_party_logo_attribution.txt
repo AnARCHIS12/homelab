@@ -1,0 +1,12 @@
+Bundled service logos
+
+The service logos in drawable-nodpi/service_*.png are bundled from the
+selfh.st/icons collection:
+https://github.com/selfhst/icons
+
+The collection is distributed under the Creative Commons Attribution 4.0
+International license. The names and logos remain trademarks of their
+respective owners.
+
+Maltrail's logo is from the Maltrail project:
+https://github.com/stamparm/maltrail
