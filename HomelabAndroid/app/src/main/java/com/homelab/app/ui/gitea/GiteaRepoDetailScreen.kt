@@ -525,8 +525,8 @@ private fun FileViewerContent(viewModel: GiteaRepoDetailViewModel, file: GiteaFi
                                 <html>
                                 <head>
                                     <meta name="viewport" content="width=device-width, initial-scale=1">
-                                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-                                    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+                                    <link rel="stylesheet" href="highlight-github-dark.min.css">
+                                    <script src="highlight.min.js"></script>
                                     <script>hljs.highlightAll();</script>
                                     <style>
                                         body { 
@@ -557,7 +557,7 @@ private fun FileViewerContent(viewModel: GiteaRepoDetailViewModel, file: GiteaFi
                                         settings.builtInZoomControls = true
                                         settings.displayZoomControls = false
                                         setBackgroundColor(android.graphics.Color.parseColor("#1E1E1E"))
-                                        loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
+                                        loadDataWithBaseURL("file:///android_asset/", htmlContent, "text/html", "UTF-8", null)
                                     }
                                 },
                                 modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 8.dp)

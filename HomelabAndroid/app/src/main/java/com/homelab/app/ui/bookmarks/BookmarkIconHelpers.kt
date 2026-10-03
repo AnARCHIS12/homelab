@@ -44,12 +44,9 @@ internal fun extractHost(rawUrl: String): String? {
 internal fun buildFaviconCandidates(rawUrl: String): List<String> {
     val normalized = normalizeWebUrl(rawUrl)
     val host = extractHost(normalized) ?: return emptyList()
-    val encodedUrl = Uri.encode(normalized)
     val scheme = try { Uri.parse(normalized).scheme ?: "https" } catch (_: Exception) { "https" }
 
     return listOf(
-        "https://www.google.com/s2/favicons?sz=128&domain_url=$encodedUrl",
-        "https://icons.duckduckgo.com/ip3/$host.ico",
         "$scheme://$host/favicon.ico",
         "$scheme://$host/apple-touch-icon.png"
     )
