@@ -297,7 +297,7 @@ class MediaArrRepository @Inject constructor(
                     .build()
 
                 try {
-                    tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+                    tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                         if (!response.isSuccessful) {
                             throw IllegalStateException("qBittorrent authentication failed")
                         }
@@ -2994,9 +2994,9 @@ class MediaArrRepository @Inject constructor(
 
         val instanceId = headers["X-Homelab-Instance-Id"]
         val client = when {
-            allowSelfSigned != null -> tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+            allowSelfSigned != null -> tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString())
             instanceId != null -> kotlinx.coroutines.runBlocking { tlsClientSelector.forInstance(instanceId) }
-            else -> tlsClientSelector.forAllowSelfSigned(false)
+            else -> tlsClientSelector.forAllowSelfSigned(false, request.url.toString())
         }
 
         client.newCall(request).execute().use { response ->

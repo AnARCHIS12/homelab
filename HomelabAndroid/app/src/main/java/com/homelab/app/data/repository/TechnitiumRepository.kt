@@ -460,7 +460,7 @@ class TechnitiumRepository @Inject constructor(
         val url = buildLoginUrl(baseUrl, username, password, totp)
         val request = Request.Builder().url(url).get().build()
 
-        tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+        tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
             val body = response.body?.string().orEmpty()
             val root = parseObject(body)
             val status = root.string("status").lowercase()

@@ -40,7 +40,7 @@ class ServicesRepositoryTest {
         val instanceRepository = ServiceInstancesRepository(dao, settingsManager(state), credentialsStore)
         val tlsClientSelector = mockk<TlsClientSelector>()
         every { tlsClientSelector.clientForInstance(any()) } returns OkHttpClient()
-        every { tlsClientSelector.forAllowSelfSigned(any()) } returns OkHttpClient()
+        every { tlsClientSelector.forAllowSelfSigned(any(), any()) } returns OkHttpClient()
         val repository = ServicesRepository(
             serviceInstancesRepository = instanceRepository,
             tlsClientSelector = tlsClientSelector,
@@ -93,7 +93,7 @@ class ServicesRepositoryTest {
             .build()
         val tlsClientSelector = mockk<TlsClientSelector>()
         every { tlsClientSelector.clientForInstance(any()) } returns okHttpClient
-        every { tlsClientSelector.forAllowSelfSigned(any()) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(any(), any()) } returns okHttpClient
         val repository = ServicesRepository(
             serviceInstancesRepository = instanceRepository,
             tlsClientSelector = tlsClientSelector,
@@ -137,7 +137,7 @@ class ServicesRepositoryTest {
             .build()
         val tlsClientSelector = mockk<TlsClientSelector>()
         every { tlsClientSelector.clientForInstance(any()) } returns okHttpClient
-        every { tlsClientSelector.forAllowSelfSigned(any()) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(any(), any()) } returns okHttpClient
         val repository = ServicesRepository(
             serviceInstancesRepository = instanceRepository,
             tlsClientSelector = tlsClientSelector,

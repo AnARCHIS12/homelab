@@ -181,7 +181,7 @@ class CraftyRepository @Inject constructor(
             .build()
 
         try {
-            tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+            tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     if (response.code == 401 || response.code == 403) {
                         throw CraftyApiException(CraftyApiException.Kind.INVALID_CREDENTIALS)

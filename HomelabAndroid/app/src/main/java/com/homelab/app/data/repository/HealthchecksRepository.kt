@@ -21,7 +21,7 @@ class HealthchecksRepository @Inject constructor(
                 .url("$clean/api/v3/checks/")
                 .addHeader("X-Api-Key", apiKey)
                 .build()
-            tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+            tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     throw IllegalStateException("Healthchecks authentication failed")
                 }

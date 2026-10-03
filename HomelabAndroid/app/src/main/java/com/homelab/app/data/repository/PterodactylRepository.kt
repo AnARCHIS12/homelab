@@ -99,7 +99,7 @@ class PterodactylRepository @Inject constructor(
             .build()
 
         try {
-            tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+            tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                 when {
                     response.code == 401 || response.code == 403 ->
                         throw PterodactylApiException(PterodactylApiException.Kind.INVALID_CREDENTIALS)

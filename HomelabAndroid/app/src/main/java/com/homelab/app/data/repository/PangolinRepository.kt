@@ -83,7 +83,7 @@ class PangolinRepository @Inject constructor(
                 .addHeader("x-csrf-token", "x-csrf-protection")
                 .build()
 
-            val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
+            val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute()
             response.use { resp ->
                 val responseBody = try {
                     resp.peekBody(4096).string()
@@ -156,7 +156,7 @@ class PangolinRepository @Inject constructor(
                     .build()
 
                 try {
-                    val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
+                    val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute()
                     response.use { resp ->
                         if (resp.code in 401..403) {
                             throw IllegalStateException("Session Pangolin invalide ou non autorisée (HTTP ${resp.code}).")
@@ -236,7 +236,7 @@ class PangolinRepository @Inject constructor(
                     .build()
 
                 try {
-                    val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute()
+                    val response = tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute()
                     response.use { resp ->
                         if (resp.code in 401..403) {
                             throw IllegalStateException("Clé d'API Pangolin invalide ou non autorisée (HTTP ${resp.code}).")

@@ -211,7 +211,7 @@ class WakapiRepository @Inject constructor(
                     .addHeader("Content-Type", "application/json")
                     .build()
 
-                tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+                tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
                         return
                     }

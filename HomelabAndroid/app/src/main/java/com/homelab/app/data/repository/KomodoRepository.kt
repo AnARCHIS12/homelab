@@ -213,7 +213,7 @@ class KomodoRepository @Inject constructor(
             .addHeader("X-Api-Secret", apiSecret.trim())
             .build()
 
-        tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+        tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString())
             .newCall(request)
             .execute()
             .use { response ->

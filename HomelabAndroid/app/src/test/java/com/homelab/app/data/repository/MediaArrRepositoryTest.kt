@@ -29,7 +29,7 @@ class MediaArrRepositoryTest {
             }
             .build()
         val tlsClientSelector = mockk<TlsClientSelector>()
-        every { tlsClientSelector.forAllowSelfSigned(false) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(false, any()) } returns okHttpClient
         val repository = MediaArrRepository(
             serviceInstancesRepository = mockk(relaxed = true),
             tlsClientSelector = tlsClientSelector
@@ -62,7 +62,7 @@ class MediaArrRepositoryTest {
             })
             .build()
         val tlsClientSelector = mockk<TlsClientSelector>()
-        every { tlsClientSelector.forAllowSelfSigned(false) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(false, any()) } returns okHttpClient
         val repository = MediaArrRepository(
             serviceInstancesRepository = mockk(relaxed = true),
             tlsClientSelector = tlsClientSelector
@@ -99,7 +99,7 @@ class MediaArrRepositoryTest {
             })
             .build()
         val tlsClientSelector = mockk<TlsClientSelector>()
-        every { tlsClientSelector.forAllowSelfSigned(false) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(false, any()) } returns okHttpClient
         val repository = MediaArrRepository(
             serviceInstancesRepository = mockk(relaxed = true),
             tlsClientSelector = tlsClientSelector

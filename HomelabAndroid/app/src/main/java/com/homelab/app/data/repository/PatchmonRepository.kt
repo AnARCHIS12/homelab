@@ -70,7 +70,7 @@ class PatchmonRepository @Inject constructor(
                 .addHeader("Content-Type", "application/json")
                 .build()
 
-            tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+            tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                 if (response.isSuccessful) return@use
                 val body = response.body?.string().orEmpty()
                 throw mapHttpStatus(response.code, body)

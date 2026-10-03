@@ -39,7 +39,7 @@ class PlexRepository @Inject constructor(
                 .addHeader("Accept", "application/json")
                 .build()
 
-            tlsClientSelector.forAllowSelfSigned(allowSelfSigned).newCall(request).execute().use { response ->
+            tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString()).newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     throw IllegalStateException("Plex authentication failed")
                 }

@@ -123,8 +123,9 @@ class UptimeKumaRepository @Inject constructor(
             requestBuilder.addHeader("Authorization", "Basic $encoded")
         }
 
-        tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
-            .newCall(requestBuilder.build())
+        val request = requestBuilder.build()
+        tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString())
+            .newCall(request)
             .execute()
             .use { response ->
                 when (response.code) {

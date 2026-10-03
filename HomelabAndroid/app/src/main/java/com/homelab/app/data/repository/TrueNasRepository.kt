@@ -253,7 +253,7 @@ class TrueNasRepository @Inject constructor(
         method: String,
         params: List<JsonElement> = emptyList()
     ): JsonElement = withContext(Dispatchers.IO) {
-        val client = tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+        val client = tlsClientSelector.forAllowSelfSigned(allowSelfSigned, baseUrl)
             .newBuilder()
             .connectTimeout(8, TimeUnit.SECONDS)
             .readTimeout(12, TimeUnit.SECONDS)

@@ -129,7 +129,7 @@ class JellystatRepositoryTest {
         val requestSlot = slot<Request>()
         val repository = JellystatRepository(api, tlsClientSelector)
 
-        every { tlsClientSelector.forAllowSelfSigned(false) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(false, any()) } returns okHttpClient
         every { okHttpClient.newCall(capture(requestSlot)) } returns call
         every { call.execute() } answers { response(requestSlot.captured, 200) }
 
@@ -152,7 +152,7 @@ class JellystatRepositoryTest {
         val requestSlot = slot<Request>()
         val repository = JellystatRepository(api, tlsClientSelector)
 
-        every { tlsClientSelector.forAllowSelfSigned(false) } returns okHttpClient
+        every { tlsClientSelector.forAllowSelfSigned(false, any()) } returns okHttpClient
         every { okHttpClient.newCall(capture(requestSlot)) } returns call
         every { call.execute() } answers { response(requestSlot.captured, 401) }
 

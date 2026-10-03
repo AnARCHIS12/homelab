@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Singleton
 class TlsClientSelector @Inject constructor(
@@ -34,9 +35,19 @@ class TlsClientSelector @Inject constructor(
         }
     }
 
-    fun forAllowSelfSigned(allowSelfSigned: Boolean): OkHttpClient {
-        // Blind trust is permanently removed.
-        return secureClient
+    fun forAllowSelfSigned(allowSelfSigned: Boolean, requestUrl: String? = null): OkHttpClient {
+        // The old implementation returned a blind trust-all client here. Keep the
+        // parameter for repository compatibility, but always use normal certificate
+        // validation. The URL is used only to apply the per-connection HTTP policy.
+        val url = requestUrl?.toHttpUrlOrNull() ?: return secureClient
+        val transientInstance = ServiceInstance(
+            id = "login-${url.host}-${url.port}",
+            type = com.homelab.app.util.ServiceType.UNKNOWN,
+            label = "Transient connection",
+            url = url.toString(),
+            allowHttp = url.scheme == "http"
+        )
+        return clientForInstance(transientInstance)
     }
 
     suspend fun forInstance(instanceId: String): OkHttpClient {

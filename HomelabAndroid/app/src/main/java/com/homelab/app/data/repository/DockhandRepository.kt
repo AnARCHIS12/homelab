@@ -763,10 +763,10 @@ class DockhandRepository @Inject constructor(
             .addHeader("Content-Type", "application/json")
             .build()
         val client = when {
-            allowSelfSigned != null -> tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+            allowSelfSigned != null -> tlsClientSelector.forAllowSelfSigned(allowSelfSigned, baseUrl)
             instanceId != null -> runCatching { kotlinx.coroutines.runBlocking { tlsClientSelector.forInstance(instanceId) } }
-                .getOrElse { tlsClientSelector.forAllowSelfSigned(false) }
-            else -> tlsClientSelector.forAllowSelfSigned(false)
+                .getOrElse { tlsClientSelector.forAllowSelfSigned(false, baseUrl) }
+            else -> tlsClientSelector.forAllowSelfSigned(false, baseUrl)
         }
         return client.newCall(request).execute()
     }
@@ -783,9 +783,9 @@ class DockhandRepository @Inject constructor(
 
         return runCatching {
             val client = when {
-                allowSelfSigned != null -> tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
-                instanceId != null -> runCatching { kotlinx.coroutines.runBlocking { tlsClientSelector.forInstance(instanceId) } }.getOrElse { tlsClientSelector.forAllowSelfSigned(false) }
-                else -> tlsClientSelector.forAllowSelfSigned(false)
+                allowSelfSigned != null -> tlsClientSelector.forAllowSelfSigned(allowSelfSigned, baseUrl)
+                instanceId != null -> runCatching { kotlinx.coroutines.runBlocking { tlsClientSelector.forInstance(instanceId) } }.getOrElse { tlsClientSelector.forAllowSelfSigned(false, baseUrl) }
+                else -> tlsClientSelector.forAllowSelfSigned(false, baseUrl)
             }
             client.newCall(builder.build()).execute().use { response ->
                 response.code in 200..399

@@ -161,7 +161,7 @@ class DockmonRepository @Inject constructor(
             .addHeader("Authorization", "Bearer $token")
             .build()
 
-        tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+        tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString())
             .newCall(request)
             .execute()
             .use { response ->

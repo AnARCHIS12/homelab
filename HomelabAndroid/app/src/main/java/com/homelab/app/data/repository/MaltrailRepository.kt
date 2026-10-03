@@ -177,7 +177,7 @@ class MaltrailRepository @Inject constructor(
         }
         val request = requestBuilder.build()
 
-        tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+        tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString())
             .newCall(request)
             .execute()
             .use { response ->
@@ -208,7 +208,7 @@ class MaltrailRepository @Inject constructor(
             .addHeader("Accept", "text/plain")
             .build()
 
-        tlsClientSelector.forAllowSelfSigned(allowSelfSigned)
+        tlsClientSelector.forAllowSelfSigned(allowSelfSigned, request.url.toString())
             .newCall(request)
             .execute()
             .use { response ->
