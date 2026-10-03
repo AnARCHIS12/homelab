@@ -174,7 +174,7 @@ class TechnitiumRepository @Inject constructor(
 
     suspend fun getOverview(instanceId: String): TechnitiumOverview = withValidToken(instanceId) { token ->
         val root = api.getDashboardStats(
-            token = token,
+            authorization = bearer(token),
             type = TechnitiumStatsRange.LAST_HOUR.apiValue,
             utc = true,
             instanceId = instanceId
@@ -196,7 +196,7 @@ class TechnitiumRepository @Inject constructor(
             coroutineScope {
                 val statsDeferred = async {
                     api.getDashboardStats(
-                        token = token,
+                        authorization = bearer(token),
                         type = range.apiValue,
                         utc = true,
                         instanceId = instanceId
@@ -206,7 +206,7 @@ class TechnitiumRepository @Inject constructor(
                 val topClientsDeferred = async {
                     runCatching {
                         api.getTopStats(
-                            token = token,
+                            authorization = bearer(token),
                             type = range.apiValue,
                             statsType = "TopClients",
                             limit = 20,
@@ -218,7 +218,7 @@ class TechnitiumRepository @Inject constructor(
                 val topDomainsDeferred = async {
                     runCatching {
                         api.getTopStats(
-                            token = token,
+                            authorization = bearer(token),
                             type = range.apiValue,
                             statsType = "TopDomains",
                             limit = 20,
@@ -230,7 +230,7 @@ class TechnitiumRepository @Inject constructor(
                 val topBlockedDeferred = async {
                     runCatching {
                         api.getTopStats(
-                            token = token,
+                            authorization = bearer(token),
                             type = range.apiValue,
                             statsType = "TopBlockedDomains",
                             limit = 20,
@@ -240,23 +240,23 @@ class TechnitiumRepository @Inject constructor(
                 }
 
                 val settingsDeferred = async {
-                    runCatching { api.getSettings(token = token, instanceId = instanceId) }.getOrNull()
+                    runCatching { api.getSettings(authorization = bearer(token), instanceId = instanceId) }.getOrNull()
                 }
 
                 val blockedDeferred = async {
-                    runCatching { api.listBlockedZones(token = token, domain = "", instanceId = instanceId) }.getOrNull()
+                    runCatching { api.listBlockedZones(authorization = bearer(token), domain = "", instanceId = instanceId) }.getOrNull()
                 }
 
                 val zonesDeferred = async {
-                    runCatching { api.listZones(token = token, pageNumber = 1, zonesPerPage = 1, instanceId = instanceId) }.getOrNull()
+                    runCatching { api.listZones(authorization = bearer(token), pageNumber = 1, zonesPerPage = 1, instanceId = instanceId) }.getOrNull()
                 }
 
                 val cacheDeferred = async {
-                    runCatching { api.listCache(token = token, domain = "", instanceId = instanceId) }.getOrNull()
+                    runCatching { api.listCache(authorization = bearer(token), domain = "", instanceId = instanceId) }.getOrNull()
                 }
 
                 val logsDeferred = async {
-                    runCatching { api.listLogs(token = token, instanceId = instanceId) }.getOrNull()
+                    runCatching { api.listLogs(authorization = bearer(token), instanceId = instanceId) }.getOrNull()
                 }
 
                 val statsResponse = requireSuccess(statsDeferred.await())
@@ -385,9 +385,9 @@ class TechnitiumRepository @Inject constructor(
         withValidToken(instanceId) { token ->
             val response = api.setSettings(
                 params = mapOf(
-                    "token" to token,
                     "enableBlocking" to enabled.toString()
                 ),
+                authorization = bearer(token),
                 instanceId = instanceId
             )
             ensureSuccess(response)
@@ -399,7 +399,7 @@ class TechnitiumRepository @Inject constructor(
 
     suspend fun forceUpdateBlockLists(instanceId: String): TechnitiumActionResult =
         withValidToken(instanceId) { token ->
-            val response = api.forceUpdateBlockLists(token = token, instanceId = instanceId)
+            val response = api.forceUpdateBlockLists(authorization = bearer(token), instanceId = instanceId)
             ensureSuccess(response)
             TechnitiumActionResult(success = true, message = "Block lists update started")
         }
@@ -407,7 +407,7 @@ class TechnitiumRepository @Inject constructor(
     suspend fun temporaryDisableBlocking(instanceId: String, minutes: Int): TechnitiumActionResult =
         withValidToken(instanceId) { token ->
             val safeMinutes = minutes.coerceIn(1, 240)
-            val response = api.temporaryDisableBlocking(token = token, minutes = safeMinutes, instanceId = instanceId)
+            val response = api.temporaryDisableBlocking(authorization = bearer(token), minutes = safeMinutes, instanceId = instanceId)
             val body = requireSuccess(response)
             val till = body.string("temporaryDisableBlockingTill")
             val msg = if (till.isNotBlank()) {
@@ -422,7 +422,7 @@ class TechnitiumRepository @Inject constructor(
         withValidToken(instanceId) { token ->
             val cleanDomain = normalizeDomain(domain)
             require(cleanDomain.isNotEmpty()) { "Domain is required" }
-            val response = api.addBlockedZone(token = token, domain = cleanDomain, instanceId = instanceId)
+            val response = api.addBlockedZone(authorization = bearer(token), domain = cleanDomain, instanceId = instanceId)
             ensureSuccess(response)
             TechnitiumActionResult(success = true, message = "$cleanDomain blocked")
         }
@@ -431,7 +431,7 @@ class TechnitiumRepository @Inject constructor(
         withValidToken(instanceId) { token ->
             val cleanDomain = normalizeDomain(domain)
             require(cleanDomain.isNotEmpty()) { "Domain is required" }
-            val response = api.deleteBlockedZone(token = token, domain = cleanDomain, instanceId = instanceId)
+            val response = api.deleteBlockedZone(authorization = bearer(token), domain = cleanDomain, instanceId = instanceId)
             ensureSuccess(response)
             TechnitiumActionResult(success = true, message = "$cleanDomain unblocked")
         }
@@ -469,6 +469,8 @@ class TechnitiumRepository @Inject constructor(
             return call(refreshedToken)
         }
     }
+
+    private fun bearer(token: String): String = "Bearer ${token.trim()}"
 
     private fun resolveStoredToken(instance: com.homelab.app.domain.model.ServiceInstance): String {
         val token = instance.token.trim()
