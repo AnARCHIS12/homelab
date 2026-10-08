@@ -57,6 +57,24 @@ class HomelabCertificateTrustTest {
     }
 
     @Test
+    fun `checkServerTrusted rejects pinned certificate when it is not the leaf`() {
+        val attackerLeaf = mockk<X509Certificate>()
+        val pinnedIssuer = mockk<X509Certificate>()
+        every { attackerLeaf.encoded } returns "attacker-leaf".toByteArray()
+        every { pinnedIssuer.encoded } returns "pinned-issuer".toByteArray()
+
+        val pinnedFingerprint = HomelabCertificateTrust.computeSha256Fingerprint(pinnedIssuer)
+        val trustManager = HomelabCertificateTrust.createTrustManager(
+            pinnedFingerprints = setOf(pinnedFingerprint)
+        )
+
+        val exception = assertThrows(CertificateException::class.java) {
+            trustManager.checkServerTrusted(arrayOf(attackerLeaf, pinnedIssuer), "RSA")
+        }
+        assertTrue(exception.message?.contains("Certificate pinning failure") == true)
+    }
+
+    @Test
     fun `checkServerTrusted throws when certificate chain is empty`() {
         val trustManager = HomelabCertificateTrust.createTrustManager()
 

@@ -103,13 +103,12 @@ object HomelabCertificateTrust {
                     throw CertificateException("Certificate chain is empty")
                 }
 
-                // If fingerprint pinning is configured, verify that at least one certificate
-                // in the presented chain matches a pinned fingerprint.
+                // If fingerprint pinning is configured, pin only the leaf certificate.
+                // Trusting any certificate later in the chain would let an attacker place
+                // the public, legitimate certificate after an attacker-controlled leaf.
                 if (normalizedPins.isNotEmpty()) {
-                    val matched = chain.any { cert ->
-                        val fp = computeSha256Fingerprint(cert)
-                        normalizedPins.contains(fp)
-                    }
+                    val leafFingerprint = computeSha256Fingerprint(chain[0])
+                    val matched = normalizedPins.contains(leafFingerprint)
                     if (!matched) {
                         val presentedFingerprints = chain.map { computeSha256Fingerprint(it) }
                         throw CertificateException(
