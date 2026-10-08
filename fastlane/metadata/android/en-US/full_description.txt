@@ -2,7 +2,8 @@ Homelab is a fast, 100% native Android dashboard designed for managing your self
 
 Key features:
 • Supports 34+ homelab services natively (Proxmox VE, Portainer, Pi-hole, AdGuard Home, Beszel, Technitium DNS, Nginx Proxy Manager, Gitea, Plex, Servarr suite, and more).
-• Zero cloud intermediaries, zero analytics, zero telemetry: communicates directly with your servers on LAN, VPN, or reverse proxy.
+• Zero cloud intermediaries, zero analytics, zero telemetry: communicates directly with your servers on LAN, VPN, or reverse proxy. UniFi Network cloud access is optional through Ubiquiti's api.ui.com API.
+• Bookmark icons can optionally use the selfh.st icon library; this sends only the selected icon name to raw.githubusercontent.com, never the private bookmark URL.
 • Hardware-backed credential encryption with Android KeyStore (AES-256-GCM).
 • Modern Material 3 UI with dark and light themes.
 • 100% free and open-source under Apache 2.0 license.

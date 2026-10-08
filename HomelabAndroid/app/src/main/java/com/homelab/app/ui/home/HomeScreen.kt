@@ -8,6 +8,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -66,6 +67,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,7 +84,6 @@ import com.homelab.app.ui.theme.StatusGreen
 import com.homelab.app.ui.components.ServiceIcon
 import com.homelab.app.ui.theme.primaryColor
 import com.homelab.app.util.ServiceType
-import coil3.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -486,8 +487,6 @@ private fun InstanceCard(
     }
 }
 
-private const val TAILSCALE_ICON_URL = "https://cdn.jsdelivr.net/gh/selfhst/icons/png/tailscale.png"
-
 @Composable
 private fun ConnectInstanceCard(
     type: ServiceType,
@@ -558,26 +557,11 @@ fun TailscaleCard(isConnected: Boolean) {
                 modifier = Modifier.size(44.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    SubcomposeAsyncImage(
-                        model = TAILSCALE_ICON_URL,
+                    Image(
+                        painter = painterResource(com.homelab.app.R.drawable.tailscale),
                         contentDescription = stringResource(R.string.tailscale_open),
                         modifier = Modifier.size(26.dp),
-                        contentScale = ContentScale.Fit,
-                        loading = {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(14.dp),
-                                strokeWidth = 1.8.dp,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        error = {
-                            Icon(
-                                Icons.Default.Security,
-                                contentDescription = stringResource(R.string.tailscale_open),
-                                tint = if (isConnected) StatusGreen else MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                        contentScale = ContentScale.Fit
                     )
                 }
             }

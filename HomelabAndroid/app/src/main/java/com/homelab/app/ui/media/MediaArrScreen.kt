@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.clickable
@@ -96,6 +97,7 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -122,14 +124,12 @@ import com.homelab.app.ui.components.ServiceIcon
 import com.homelab.app.ui.theme.primaryColor
 import com.homelab.app.util.ServiceType
 import coil3.compose.AsyncImage
-import coil3.compose.SubcomposeAsyncImage
 import java.util.Locale
 import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-private const val MEDIA_TAILSCALE_ICON_URL = "https://cdn.jsdelivr.net/gh/selfhst/icons/png/tailscale.png"
 private const val QBITTORRENT_REFRESH_INTERVAL_MS = 30_000L
 
 @Composable
@@ -330,26 +330,11 @@ fun MediaArrScreen(
                                 modifier = Modifier.size(40.dp)
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
-                                    SubcomposeAsyncImage(
-                                        model = MEDIA_TAILSCALE_ICON_URL,
+                                    Image(
+                                        painter = painterResource(com.homelab.app.R.drawable.tailscale),
                                         contentDescription = stringResource(R.string.tailscale_open),
                                         modifier = Modifier.size(24.dp),
-                                        contentScale = ContentScale.Fit,
-                                        loading = {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.size(14.dp),
-                                                strokeWidth = 1.8.dp,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        },
-                                        error = {
-                                            Icon(
-                                                imageVector = if (tailscaleConnected) Icons.Default.CheckCircle else Icons.Default.Warning,
-                                                contentDescription = null,
-                                                tint = if (tailscaleConnected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
+                                        contentScale = ContentScale.Fit
                                     )
                                 }
                             }

@@ -36,7 +36,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.layout.ContentScale
-import coil3.compose.AsyncImage
 import com.homelab.app.BuildConfig
 import com.homelab.app.R
 import androidx.compose.ui.platform.LocalContext
@@ -762,7 +761,7 @@ fun SettingsScreen(
                 ) {
                     ContactChip(
                         label = stringResource(R.string.settings_contact_repository),
-                        iconUrl = "https://cdn.jsdelivr.net/gh/selfhst/icons/png/github.png",
+                        iconRes = R.drawable.github,
                         onClick = { uriHandler.openUri("https://github.com/AnARCHIS12") },
                         modifier = Modifier.weight(1f)
                     )
@@ -937,7 +936,7 @@ private fun AppIconOptionCard(
 @Composable
 private fun ContactChip(
     label: String,
-    iconUrl: String,
+    iconRes: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -956,8 +955,8 @@ private fun ContactChip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            AsyncImage(
-                model = iconUrl,
+            Image(
+                painter = painterResource(iconRes),
                 contentDescription = label,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(18.dp)
