@@ -339,6 +339,10 @@ body {
   margin: 18px auto 4px;
 }
 
+.hero .fdroid-badge-hero img {
+  width: 150px;
+}
+
 .store-badge-link {
   display: inline-flex;
   align-items: center;
