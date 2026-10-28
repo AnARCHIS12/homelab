@@ -331,12 +331,12 @@ body {
 
 .fdroid-badge img {
   display: block;
-  width: 190px;
+  width: 128px;
   height: auto;
 }
 
-.fdroid-badge-card {
-  margin-top: 8px;
+.hero .fdroid-badge {
+  margin: 18px auto 4px;
 }
 
 .store-badge-link {

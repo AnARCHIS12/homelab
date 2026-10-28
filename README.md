@@ -9,6 +9,8 @@
 [![Made with Jetpack Compose](https://img.shields.io/badge/Made%20with-Jetpack%20Compose-green.svg?logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
+[![Get it on F-Droid](docs/assets/fdroid-badge.png)](https://f-droid.org/packages/com.homelab.app/)
+
 Homelab is a native Android application for monitoring and managing your self-hosted infrastructure from one place. Built with modern Android architecture, Kotlin, and Jetpack Compose (Material 3), it provides a fluid, secure, and intuitive dashboard for your servers, containers, networks, and services.
 
 ---
@@ -199,8 +201,6 @@ The Android app is built with **Kotlin** and **Jetpack Compose** for **Android 8
 ### Install from F-Droid
 
 Homelab is now available on F-Droid. [Install Homelab from F-Droid](https://f-droid.org/packages/com.homelab.app/) to receive the free-software build and updates through the F-Droid repository.
-
-[![Get it on F-Droid](docs/assets/fdroid-badge.png)](https://f-droid.org/packages/com.homelab.app/)
 
 ### Direct APK Download
 
