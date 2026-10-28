@@ -317,6 +317,49 @@ body {
   border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
+.fdroid-badge {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.fdroid-badge:hover,
+.fdroid-badge:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.fdroid-badge img {
+  display: block;
+  width: 190px;
+  height: auto;
+}
+
+.fdroid-badge-card {
+  margin-top: 8px;
+}
+
+.store-badge-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  border-radius: var(--radius-full);
+  color: var(--accent-emerald);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.store-badge-link:hover,
+.store-badge-link:focus-visible {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: var(--accent-emerald);
+}
+
 /* Hero Section */
 .hero {
   padding: clamp(40px, 8vw, 80px) 0 clamp(60px, 10vw, 100px);

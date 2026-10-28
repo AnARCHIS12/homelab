@@ -196,6 +196,12 @@ The Android app is built with **Kotlin** and **Jetpack Compose** for **Android 8
 
 ## Installation
 
+### Install from F-Droid
+
+Homelab is now available on F-Droid. [Install Homelab from F-Droid](https://f-droid.org/packages/com.homelab.app/) to receive the free-software build and updates through the F-Droid repository.
+
+[![Get it on F-Droid](docs/assets/fdroid-badge.png)](https://f-droid.org/packages/com.homelab.app/)
+
 ### Direct APK Download
 
 Download the latest release APK directly from the Releases section:
