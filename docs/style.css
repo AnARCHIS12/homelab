@@ -331,37 +331,15 @@ body {
 
 .fdroid-badge img {
   display: block;
-  width: 110px;
-  height: auto;
+  height: 56px;
+  width: auto;
 }
 
-.hero .fdroid-badge {
-  margin: 18px auto 4px;
-}
-
-.hero .fdroid-badge-hero img {
-  width: 150px;
-}
-
-.store-badge-link {
-  display: inline-flex;
+.install-actions {
+  display: flex;
   align-items: center;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid rgba(52, 211, 153, 0.45);
-  border-radius: var(--radius-full);
-  color: var(--accent-emerald);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  transition: background 160ms ease, border-color 160ms ease;
-}
-
-.store-badge-link:hover,
-.store-badge-link:focus-visible {
-  background: rgba(52, 211, 153, 0.12);
-  border-color: var(--accent-emerald);
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 /* Hero Section */
@@ -1041,47 +1019,6 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* Sticky Bottom Mobile Bar */
-.mobile-sticky-bar {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 90;
-  background: rgba(7, 9, 14, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid var(--card-border);
-  padding: 12px 20px;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.mobile-sticky-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.mobile-sticky-logo {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-}
-
-.mobile-sticky-text {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.mobile-sticky-sub {
-  font-size: 0.72rem;
-  color: var(--accent-emerald);
-}
-
 /* Modal for full privacy */
 .modal-overlay {
   position: fixed;
@@ -1235,14 +1172,6 @@ body {
   
   .nav-toggle-btn {
     display: block;
-  }
-  
-  .mobile-sticky-bar {
-    display: flex;
-  }
-  
-  body {
-    padding-bottom: 70px;
   }
   
   .services-controls {

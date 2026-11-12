@@ -47,11 +47,8 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           <span style="display: none; @media(min-width: 480px){display:inline;}">GitHub</span>
         </a>
-        <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-primary btn-sm direct-download-btn">
-          <span>Download APK</span>
-        </a>
-        <a href="https://f-droid.org/packages/com.homelab.app/" class="store-badge-link" target="_blank" rel="noopener" aria-label="Get Homelab from F-Droid">
-          <span class="store-badge-label">Available on F-Droid</span>
+        <a href="#install" class="btn btn-primary btn-sm">
+          <span>Get the app</span>
         </a>
         <button id="navToggleBtn" class="nav-toggle-btn" aria-label="Toggle navigation">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -85,17 +82,13 @@
           A blazing-fast, secure, and fully native Android dashboard to monitor and manage your servers, containers, networks, and media stacks. Zero cloud, zero telemetry, and zero donations.
         </p>
 
-        <a href="https://f-droid.org/packages/com.homelab.app/" class="fdroid-badge fdroid-badge-hero" target="_blank" rel="noopener" aria-label="Get Homelab on F-Droid">
-          <img src="assets/fdroid-badge.png" alt="Get it on F-Droid">
-        </a>
-
         <div class="hero-cta-group">
-          <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" id="heroDownloadBtn" class="btn btn-primary btn-lg direct-download-btn">
+          <a href="https://f-droid.org/packages/com.homelab.app/" class="fdroid-badge" target="_blank" rel="noopener" aria-label="Get Homelab on F-Droid">
+            <img src="assets/fdroid-badge.png" alt="Get it on F-Droid">
+          </a>
+          <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" id="heroDownloadBtn" class="btn btn-secondary btn-lg direct-download-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span id="heroDownloadText">Download APK (Latest Release)</span>
-          </a>
-          <a href="#showcase" class="btn btn-secondary btn-lg">
-            <span>Explore Showcase</span>
           </a>
         </div>
 
@@ -387,20 +380,24 @@
         <div class="bento-grid">
           <!-- Install via APK -->
           <div class="bento-card bento-card-6">
-            <h3 class="bento-title">Direct APK Download</h3>
+            <h3 class="bento-title">Install on Android</h3>
             <p class="bento-desc" style="margin-bottom: 20px;">
-              Download the release APK directly to your phone. No Google Play required, no account needed.
+              Get Homelab from F-Droid for automatic updates, or grab the release APK directly. No Google Play required, no account needed.
             </p>
             <ol style="color: var(--text-secondary); margin-left: 20px; line-height: 1.8; margin-bottom: 24px; font-size: 0.92rem;">
-              <li>Tap the button below to download <code>Homelab.apk</code>.</li>
-              <li>Open the downloaded APK to install.</li>
-              <li>Allow "Install unknown apps" if requested by Android.</li>
+              <li>Install from F-Droid, or download <code>Homelab.apk</code>.</li>
+              <li>For the APK, allow "Install unknown apps" if requested by Android.</li>
               <li>Add your services and enjoy your homelab on mobile!</li>
             </ol>
-            <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-primary direct-download-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>Download Homelab.apk</span>
-            </a>
+            <div class="install-actions">
+              <a href="https://f-droid.org/packages/com.homelab.app/" class="fdroid-badge" target="_blank" rel="noopener" aria-label="Get Homelab on F-Droid">
+                <img src="assets/fdroid-badge.png" alt="Get it on F-Droid">
+              </a>
+              <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-secondary direct-download-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span>Download APK</span>
+              </a>
+            </div>
           </div>
 
           <!-- Build from Source -->
@@ -425,21 +422,6 @@ cd homelab-project/HomelabAndroid
       </div>
     </section>
   </main>
-
-  <!-- Sticky Bottom Bar for Mobile Devices -->
-  <div class="mobile-sticky-bar">
-    <div class="mobile-sticky-info">
-      <img src="assets/logo.png" alt="Homelab Logo" class="mobile-sticky-logo">
-      <div>
-        <div class="mobile-sticky-text">Homelab</div>
-        <div class="mobile-sticky-sub">100% Free · Android Native</div>
-      </div>
-    </div>
-    <a href="https://github.com/AnARCHIS12/homelab/releases/latest/download/Homelab.apk" class="btn btn-primary btn-sm direct-download-btn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline></svg>
-      <span>Download</span>
-    </a>
-  </div>
 
   <!-- Privacy Policy Modal -->
   <div id="privacyModal" class="modal-overlay">
