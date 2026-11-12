@@ -128,8 +128,7 @@ body {
 
 /* Navbar */
 .navbar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
   height: var(--header-height);
   backdrop-filter: blur(16px);
@@ -202,7 +201,7 @@ body {
 
 .nav-mobile-menu {
   display: none;
-  position: fixed;
+  position: absolute;
   top: var(--header-height);
   left: 0;
   right: 0;
