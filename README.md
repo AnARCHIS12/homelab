@@ -251,7 +251,7 @@ The compiled APK will be generated at:
 
 For questions, feature requests, or bug reports, please open an issue on GitHub.
 
-- **Privacy Policy:** See [docs/privacy.html](docs/privacy.html)
+- **Privacy Policy:** [Read the privacy policy](https://anarchis12.github.io/homelab/privacy.html)
 
 ---
 
