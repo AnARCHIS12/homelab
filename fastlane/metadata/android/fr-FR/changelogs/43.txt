@@ -1,0 +1,5 @@
+- Alertes en arrière-plan : vérification toutes les 15 min, notification quand un service tombe ou revient (sans services Google).
+- Les notifications affichent le logo Homelab et l'icône choisie.
+- Appui long sur l'icône pour ouvrir vos premiers services.
+- Ajout d'une autre instance d'un service depuis son tableau de bord.
+- Traductions française, espagnole, allemande et italienne complétées.

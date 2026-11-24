@@ -12,9 +12,9 @@ RepoType: git
 Repo: https://github.com/AnARCHIS12/homelab.git
 
 Builds:
-  - versionName: 1.6.5
-    versionCode: 42
-    commit: ec302d2afbbb46cfd2bb8386f5c71d0260657e4b
+  - versionName: 1.6.6
+    versionCode: 43
+    commit: v1.6.6
     subdir: HomelabAndroid/app
     gradle:
       - yes
@@ -22,5 +22,5 @@ Builds:
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 1.6.5
-CurrentVersionCode: 42
+CurrentVersion: 1.6.6
+CurrentVersionCode: 43

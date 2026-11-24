@@ -1,0 +1,5 @@
+- Background alerts: optional check every 15 min, notification when a service goes down or comes back (no Google services needed).
+- Notifications show the Homelab logo and your chosen app icon.
+- Long-press the app icon to open your first services.
+- Easier to add another instance of a service from its dashboard.
+- Completed French, Spanish, German and Italian translations.
