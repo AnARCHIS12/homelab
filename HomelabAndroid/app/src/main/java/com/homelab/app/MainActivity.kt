@@ -17,7 +17,11 @@ import com.homelab.app.ui.security.PinSetupScreen
 import com.homelab.app.ui.security.SecurityViewModel
 import com.homelab.app.ui.settings.SettingsViewModel
 import com.homelab.app.ui.settings.UpdatePopupDialog
+import com.homelab.app.util.AppShortcuts
 import com.homelab.app.util.NotificationHelper
+import com.homelab.app.util.ShortcutTarget
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -61,11 +65,14 @@ class MainActivity : AppCompatActivity() {
     private var needsSetup by mutableStateOf(true)
     private var servicesReady by mutableStateOf(false)
     private var lastBackgroundTime: Long = 0L
+    private var pendingShortcut by mutableStateOf<ShortcutTarget?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition { !servicesReady }
         super.onCreate(savedInstanceState)
+        pendingShortcut = AppShortcuts.parse(intent)
+        publishLauncherShortcuts()
 
         lifecycleScope.launch {
             try {
@@ -164,7 +171,10 @@ class MainActivity : AppCompatActivity() {
                         val settingsVm = ViewModelProvider(this@MainActivity)[SettingsViewModel::class.java]
                         val popupState by settingsVm.updatePopupState.collectAsStateWithLifecycle()
 
-                        AppNavigation()
+                        AppNavigation(
+                            pendingShortcut = pendingShortcut,
+                            onShortcutHandled = { pendingShortcut = null }
+                        )
 
                         popupState?.let { popup ->
                             UpdatePopupDialog(
@@ -182,6 +192,24 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        AppShortcuts.parse(intent)?.let { pendingShortcut = it }
+    }
+
+    /** Keeps the launcher shortcuts in sync with the home list order, visibility and instances. */
+    private fun publishLauncherShortcuts() {
+        lifecycleScope.launch {
+            combine(
+                preferencesRepository.serviceOrder,
+                preferencesRepository.hiddenServices,
+                servicesRepository.preferredInstancesByType
+            ) { order, hidden, preferred -> AppShortcuts.select(order, hidden, preferred) }
+                .distinctUntilChanged()
+                .collect { AppShortcuts.publish(this@MainActivity, it) }
         }
     }
 

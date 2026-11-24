@@ -57,6 +57,7 @@ class LocalPreferencesRepository @Inject constructor(
     private val HIDDEN_SERVICES_KEY = stringPreferencesKey("hidden_services")
     private val SERVICE_ORDER_KEY = stringPreferencesKey("service_order")
     private val BIOMETRIC_KEY = booleanPreferencesKey("biometric_enabled")
+    private val BACKGROUND_ALERTS_KEY = booleanPreferencesKey("background_alerts_enabled")
     private val ONBOARDING_COMPLETED_KEY = booleanPreferencesKey("onboarding_completed")
     private val BESZEL_SHOW_CPU_KEY = booleanPreferencesKey("beszel_show_cpu")
     private val BESZEL_SHOW_MEMORY_KEY = booleanPreferencesKey("beszel_show_memory")
@@ -574,6 +575,22 @@ class LocalPreferencesRepository @Inject constructor(
 
     suspend fun verifyPin(pin: String): com.homelab.app.data.security.PinVerificationResult {
         return pinSecurityManager.verifyPin(pin)
+    }
+
+    val backgroundAlertsEnabled: Flow<Boolean> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map { preferences -> preferences[BACKGROUND_ALERTS_KEY] ?: false }
+
+    suspend fun setBackgroundAlertsEnabled(enabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[BACKGROUND_ALERTS_KEY] = enabled
+        }
     }
 
     suspend fun setBiometricEnabled(enabled: Boolean) {

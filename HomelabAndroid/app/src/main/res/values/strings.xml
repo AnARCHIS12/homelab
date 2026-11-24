@@ -231,7 +231,8 @@
     <string name="settings_home_cyberpunk_desc">Apply neon borders and brand gradients to Home service cards.</string>
     <string name="settings_language_label">Language</string>
     <string name="settings_services_label">Connected services</string>
-    <string name="settings_configured_services_title">Configured Services</string>
+    <string name="settings_configured_services_title">Services &amp; instances</string>
+    <string name="settings_configured_services_desc">Add, edit or switch instances. Several instances of the same service are supported.</string>
     <string name="settings_not_connected">Not connected</string>
     <string name="settings_disconnect">Disconnect</string>
     <string name="settings_fallback_url">Fallback URL (e.g. Cloudflare)</string>
@@ -649,6 +650,8 @@
     <string name="service_instances_empty">No instances yet. Add one to connect.</string>
     <string name="service_instance_label">Instance</string>
     <string name="service_instance_active">Active</string>
+    <string name="service_instance_add_another">Add another %1$s instance</string>
+    <string name="shortcut_open_service">Open %1$s</string>
     <string name="settings_hidden_badge">Hidden</string>
     <string name="settings_add_instance">Add instance</string>
     <string name="settings_set_default">Set default</string>
@@ -1885,4 +1888,18 @@
     <string name="truenas_pool_status">Pool status</string>
     <string name="truenas_no_pools">No pools returned by TrueNAS.</string>
     <string name="truenas_no_disks">No disks returned by TrueNAS.</string>
+
+    <!-- Background alerts -->
+    <string name="notification_channel_critical_name">Critical alerts</string>
+    <string name="notification_channel_critical_desc">A service stopped responding</string>
+    <string name="notification_channel_general_name">General information</string>
+    <string name="notification_channel_general_desc">A service is reachable again</string>
+    <string name="alerts_section_title">Alerts</string>
+    <string name="alerts_enable">Background alerts</string>
+    <string name="alerts_enable_desc">Checks your services about every 15 minutes and notifies you when one stops responding or comes back. No alert is sent while all services are unreachable (phone away from home without VPN).</string>
+    <string name="alerts_permission_denied">Notifications are blocked. Allow them in the system settings to receive alerts.</string>
+    <string name="alerts_service_down_title">%1$s is not responding</string>
+    <string name="alerts_service_down_text">%1$s is unreachable since the last check.</string>
+    <string name="alerts_service_recovered_title">%1$s is back online</string>
+    <string name="alerts_service_recovered_text">%1$s responds again.</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.homelab.app.ui.settings
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.homelab.app.BuildConfig
@@ -11,6 +12,8 @@ import com.homelab.app.domain.model.ServiceInstance
 import com.homelab.app.util.AppIconManager
 import com.homelab.app.util.AppIconOption
 import com.homelab.app.util.ServiceType
+import com.homelab.app.work.ServiceAlertScheduler
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.net.HttpURLConnection
 import java.net.URL
@@ -29,7 +32,8 @@ import org.json.JSONObject
 class SettingsViewModel @Inject constructor(
     private val servicesRepository: ServicesRepository,
     private val localPreferencesRepository: LocalPreferencesRepository,
-    private val appIconManager: AppIconManager
+    private val appIconManager: AppIconManager,
+    @param:ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     data class UpdateBannerState(
@@ -86,6 +90,9 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val isPinSet: StateFlow<Boolean> = localPreferencesRepository.isPinSet
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val backgroundAlertsEnabled: StateFlow<Boolean> = localPreferencesRepository.backgroundAlertsEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init {
@@ -146,6 +153,17 @@ class SettingsViewModel @Inject constructor(
     fun setPreferredInstance(type: ServiceType, instanceId: String) {
         viewModelScope.launch {
             servicesRepository.setPreferredInstance(type, instanceId)
+        }
+    }
+
+    fun setBackgroundAlertsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            localPreferencesRepository.setBackgroundAlertsEnabled(enabled)
+            if (enabled) {
+                ServiceAlertScheduler.schedule(appContext)
+            } else {
+                ServiceAlertScheduler.cancel(appContext)
+            }
         }
     }
 

@@ -18,6 +18,15 @@ interface ServiceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatus(status: ServiceStatusEntity)
 
+    @Query("SELECT * FROM service_status")
+    suspend fun getAllOnce(): List<ServiceStatusEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStatuses(statuses: List<ServiceStatusEntity>)
+
+    @Query("DELETE FROM service_status WHERE serviceId NOT IN (:keepIds)")
+    suspend fun deleteAllExcept(keepIds: List<String>)
+
     @Query("DELETE FROM service_status")
     suspend fun clearAll()
 }

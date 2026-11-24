@@ -129,8 +129,16 @@ private fun loginRoute(type: ServiceType, instanceId: String? = null): String {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    pendingShortcut: com.homelab.app.util.ShortcutTarget? = null,
+    onShortcutHandled: () -> Unit = {}
+) {
     val navController = rememberNavController()
+    androidx.compose.runtime.LaunchedEffect(pendingShortcut) {
+        val target = pendingShortcut ?: return@LaunchedEffect
+        navController.navigate(dashboardRoute(target.type, target.instanceId)) { launchSingleTop = true }
+        onShortcutHandled()
+    }
     val items = listOf(Screen.Home, Screen.Media, Screen.Bookmarks, Screen.Settings)
     var configuredServicesUnlocked by rememberSaveable { mutableStateOf(false) }
 
@@ -215,6 +223,11 @@ fun AppNavigation() {
             }
         }
     ) { innerPadding ->
+        androidx.compose.runtime.CompositionLocalProvider(
+            com.homelab.app.ui.components.LocalAddServiceInstance provides { type ->
+                navController.navigate(loginRoute(type))
+            }
+        ) {
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
@@ -1398,6 +1411,7 @@ fun AppNavigation() {
                     }
                 )
             }
+        }
         }
     }
 }

@@ -205,6 +205,11 @@ fun SettingsScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Medium
                             )
+                            Text(
+                                text = stringResource(R.string.settings_configured_services_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Spacer(modifier = Modifier.height(6.dp))
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -378,6 +383,15 @@ fun SettingsScreen(
                         }
                     }
                 }
+            }
+
+            // --- BACKGROUND ALERTS ---
+            item {
+                val backgroundAlertsEnabled by viewModel.backgroundAlertsEnabled.collectAsState()
+                BackgroundAlertsSection(
+                    enabled = backgroundAlertsEnabled,
+                    onEnabledChange = viewModel::setBackgroundAlertsEnabled
+                )
             }
 
             // --- SECURITY ---
