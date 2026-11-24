@@ -55,3 +55,13 @@ cd HomelabAndroid
 - Creating or pushing a git tag `v*` (e.g. `v1.6.2`) triggers `.github/workflows/release.yml`.
 - The workflow automatically runs unit tests, compiles the release APK, creates the GitHub Release, and attaches `Homelab.apk`.
 - The workflow also updates `app-version.json` with the new version and direct APK download URL.
+
+Checklist for every release (F-Droid rejects inconsistent metadata):
+
+1. Bump `versionCode` and `versionName` in `HomelabAndroid/app/build.gradle.kts`.
+2. Add `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` for every locale (`en-US`, `fr-FR`), 500 characters maximum each.
+3. Update `fastlane/metadata/android/<locale>/full_description.txt` when user-visible features change.
+4. Update `app-version.json` (`latest`, `android_url`, `changelog`).
+5. Update `metadata/com.homelab.app.yml`: the `Builds` entry (`versionName`, `versionCode`) and `CurrentVersion` / `CurrentVersionCode`.
+6. Commit `chore(release): prepare Homelab X.Y.Z`, tag `vX.Y.Z` on that commit, push `main` and the tag.
+7. Commit `chore(metadata): point recipe to Homelab X.Y.Z`, replacing the `commit:` field of the build entry with the full hash of the release commit, then push.
